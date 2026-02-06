@@ -1,23 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import OpenAI from 'openai'
 import { nanoid } from 'nanoid'
 import { generatePagePrompt, parseAIResponse } from '@/lib/prompts'
+import { createAdminClient } from '@/lib/supabase'
+import { createAIClient } from '@/lib/models/client'
 import { GeneratePageRequest, PageContent } from '@/types'
-import { createClient as createSupabase } from '@/lib/supabase/server'
 
-interface AIModel {
-  id: string
-  provider: string
-  api_key: string
-  base_url: string | null
-  model_id: string
-  is_active: boolean
-  is_default: boolean
-  created_at: string
-}
-
-async function getOpenAIClient() {
-  const supabase = await createSupabase()
+async function getAIClient() {
+  const supabase = await createAdminClient()
   
   const { data: model, error } = await supabase
     .from('ai_models')
@@ -41,24 +30,20 @@ async function getOpenAIClient() {
     if (!fallback) {
       throw new Error('未配置 AI 模型，请先前往管理后台配置')
     }
-    return createAIClient(fallback)
+    return createAIClient({
+      provider: fallback.provider,
+      apiKey: fallback.api_key,
+      baseUrl: fallback.base_url,
+      modelId: fallback.model_id,
+    })
   }
 
-  return createAIClient(model)
-}
-
-function createAIClient(model: AIModel) {
-  if (model.provider === 'openai' || model.provider === 'custom') {
-    return {
-      client: new OpenAI({
-        apiKey: model.api_key,
-        baseURL: model.base_url || undefined,
-      }),
-      modelId: model.model_id,
-    }
-  }
-
-  throw new Error(`不支持的模型提供商: ${model.provider}`)
+  return createAIClient({
+    provider: model.provider,
+    apiKey: model.api_key,
+    baseUrl: model.base_url,
+    modelId: model.model_id,
+  })
 }
 
 export async function POST(request: NextRequest) {
@@ -92,26 +77,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { client: openai, modelId } = await getOpenAIClient()
+    const client = await getAIClient()
     const prompt = generatePagePrompt(idea, answers)
 
-    const completion = await openai.chat.completions.create({
-      model: modelId,
-      messages: [
-        {
-          role: 'system',
-          content: '你是一个专业的产品文案撰写专家和着陆页设计师。',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
+    const content = await client.chatCompletion([
+      {
+        role: 'system',
+        content: '你是一个专业的产品文案撰写专家和着陆页设计师。',
+      },
+      {
+        role: 'user',
+        content: prompt,
+      },
+    ], {
       temperature: 0.7,
-      max_tokens: 2000,
+      maxTokens: 2000,
     })
-
-    const content = completion.choices[0]?.message?.content
 
     if (!content) {
       throw new Error('AI响应为空')

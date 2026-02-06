@@ -1,9 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase'
+
+// 转换 snake_case -> camelCase
+function toCamelCase<T extends Record<string, any>>(obj: T): any {
+  if (Array.isArray(obj)) {
+    return obj.map(toCamelCase)
+  }
+  if (obj && typeof obj === 'object') {
+    const newObj: any = {}
+    for (const key of Object.keys(obj)) {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+      newObj[camelKey] = toCamelCase(obj[key])
+    }
+    return newObj
+  }
+  return obj
+}
 
 export async function GET() {
   try {
-    const supabase = await createClient()
+    const supabase = await createAdminClient()
     const { data: models, error } = await supabase
       .from('ai_models')
       .select('*')
@@ -11,7 +27,7 @@ export async function GET() {
 
     if (error) throw error
 
-    return NextResponse.json({ success: true, data: models })
+    return NextResponse.json({ success: true, data: toCamelCase(models) })
   } catch (error) {
     console.error('Get models error:', error)
     return NextResponse.json(
@@ -26,7 +42,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, provider, apiKey, baseUrl, modelId, description, isActive, isDefault } = body
 
-    const supabase = await createClient()
+    const supabase = await createAdminClient()
 
     if (isDefault) {
       // 先取消其他默认模型
@@ -54,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error
 
-    return NextResponse.json({ success: true, data: model })
+    return NextResponse.json({ success: true, data: toCamelCase(model) })
   } catch (error) {
     console.error('Create model error:', error)
     return NextResponse.json(

@@ -1,5 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase'
+
+// 转换 snake_case -> camelCase
+function toCamelCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map(toCamelCase)
+  }
+  if (obj && typeof obj === 'object') {
+    const newObj: any = {}
+    for (const key of Object.keys(obj)) {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase())
+      newObj[camelKey] = toCamelCase(obj[key])
+    }
+    return newObj
+  }
+  return obj
+}
 
 export async function PUT(
   request: NextRequest,
@@ -10,7 +26,7 @@ export async function PUT(
     const body = await request.json()
     const { name, provider, apiKey, baseUrl, modelId, description, isActive, isDefault } = body
 
-    const supabase = await createClient()
+    const supabase = await createAdminClient()
 
     if (isDefault) {
       // 先取消其他默认模型
@@ -40,7 +56,7 @@ export async function PUT(
 
     if (error) throw error
 
-    return NextResponse.json({ success: true, data: model })
+    return NextResponse.json({ success: true, data: toCamelCase(model) })
   } catch (error) {
     console.error('Update model error:', error)
     return NextResponse.json(
@@ -56,7 +72,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    const supabase = await createClient()
+    const supabase = await createAdminClient()
 
     const { error } = await supabase
       .from('ai_models')

@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Plus, Trash2, Edit2, Key } from 'lucide-react'
+import { MODEL_PRESETS, getPresetsByProvider } from '@/lib/models/presets'
 
 interface AIModel {
   id: string
@@ -39,6 +40,9 @@ const PROVIDERS = [
   { value: 'anthropic', label: 'Anthropic (Claude)' },
   { value: 'google', label: 'Google (Gemini)' },
   { value: 'deepseek', label: 'DeepSeek' },
+  { value: 'zhipu', label: '智谱AI (GLM)' },
+  { value: 'moonshot', label: 'Moonshot (Kimi)' },
+  { value: 'alibaba', label: '阿里云百炼 (Qwen)' },
   { value: 'custom', label: '自定义 OpenAI 兼容' },
 ]
 
@@ -56,6 +60,7 @@ export default function AdminPage() {
   const [description, setDescription] = useState('')
   const [isActive, setIsActive] = useState(true)
   const [isDefault, setIsDefault] = useState(false)
+  const [selectedPreset, setSelectedPreset] = useState('')
 
   useEffect(() => {
     fetchModels()
@@ -134,6 +139,19 @@ export default function AdminPage() {
     setIsActive(true)
     setIsDefault(false)
     setEditingModel(null)
+    setSelectedPreset('')
+  }
+
+  const handlePresetChange = (presetId: string) => {
+    setSelectedPreset(presetId)
+    const preset = MODEL_PRESETS.find(p => p.id === presetId)
+    if (preset) {
+      setModelName(preset.name)
+      setProvider(preset.provider)
+      setModelId(preset.modelId)
+      setBaseUrl(preset.baseUrl)
+      setDescription(preset.description)
+    }
   }
 
   const openEditDialog = (model: AIModel) => {
@@ -146,6 +164,7 @@ export default function AdminPage() {
     setDescription(model.description || '')
     setIsActive(model.isActive)
     setIsDefault(model.isDefault)
+    setSelectedPreset('')
     setIsModelDialogOpen(true)
   }
 
@@ -170,9 +189,12 @@ export default function AdminPage() {
               <Key className="h-5 w-5" />
               大模型管理
             </CardTitle>
-            <Dialog open={isModelDialogOpen} onOpenChange={setIsModelDialogOpen}>
+            <Dialog open={isModelDialogOpen} onOpenChange={(open) => {
+              setIsModelDialogOpen(open)
+              if (open) resetModelForm()
+            }}>
               <DialogTrigger asChild>
-                <Button onClick={resetModelForm}>
+                <Button>
                   <Plus className="h-4 w-4 mr-2" />
                   添加模型
                 </Button>
@@ -185,17 +207,15 @@ export default function AdminPage() {
                 </DialogHeader>
                 <div className="space-y-4 pt-4">
                   <div>
-                    <Label>模型名称</Label>
-                    <Input
-                      placeholder="例如：OpenAI GPT-4"
-                      value={modelName}
-                      onChange={(e) => setModelName(e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
                     <Label>提供商</Label>
-                    <Select value={provider} onValueChange={setProvider}>
+                    <Select value={provider} onValueChange={(val) => {
+                      setProvider(val)
+                      setSelectedPreset('')
+                      setModelName('')
+                      setModelId('')
+                      setBaseUrl('')
+                      setDescription('')
+                    }}>
                       <SelectTrigger className="mt-1">
                         <SelectValue />
                       </SelectTrigger>
@@ -208,6 +228,28 @@ export default function AdminPage() {
                       </SelectContent>
                     </Select>
                   </div>
+                  
+                  {!editingModel && getPresetsByProvider(provider).length > 0 && (
+                    <div>
+                      <Label>选择模型</Label>
+                      <Select value={selectedPreset} onValueChange={handlePresetChange}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder={`选择 ${PROVIDERS.find(p => p.value === provider)?.label} 模型`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getPresetsByProvider(provider).map((preset) => (
+                            <SelectItem key={preset.id} value={preset.id}>
+                              {preset.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        选择预设模型自动填充配置
+                      </p>
+                    </div>
+                  )}
+                  
                   <div>
                     <Label>API Key</Label>
                     <Input
@@ -217,36 +259,63 @@ export default function AdminPage() {
                       onChange={(e) => setApiKey(e.target.value)}
                       className="mt-1"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      只需填写 API Key，其他配置已预设
+                    </p>
                   </div>
-                  {provider === 'custom' && (
-                    <div>
-                      <Label>Base URL (可选)</Label>
-                      <Input
-                        placeholder="https://api.custom.com/v1"
-                        value={baseUrl}
-                        onChange={(e) => setBaseUrl(e.target.value)}
-                        className="mt-1"
-                      />
+                  
+                  {selectedPreset && (
+                    <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                      <h4 className="text-sm font-medium">预设配置</h4>
+                      <div className="text-sm space-y-1 text-muted-foreground">
+                        <div><span className="font-medium">名称:</span> {modelName}</div>
+                        <div><span className="font-medium">模型ID:</span> {modelId}</div>
+                        <div><span className="font-medium">Base URL:</span> {baseUrl}</div>
+                        <div><span className="font-medium">描述:</span> {description}</div>
+                      </div>
                     </div>
                   )}
-                  <div>
-                    <Label>模型 ID</Label>
-                    <Input
-                      placeholder="gpt-4o-mini"
-                      value={modelId}
-                      onChange={(e) => setModelId(e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label>描述</Label>
-                    <Input
-                      placeholder="简短描述这个模型的用途"
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      className="mt-1"
-                    />
-                  </div>
+                  
+                  {!selectedPreset && (
+                    <>
+                      <div>
+                        <Label>模型名称</Label>
+                        <Input
+                          placeholder="例如：OpenAI GPT-4"
+                          value={modelName}
+                          onChange={(e) => setModelName(e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>Base URL</Label>
+                        <Input
+                          placeholder="https://api.custom.com/v1"
+                          value={baseUrl}
+                          onChange={(e) => setBaseUrl(e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>模型 ID</Label>
+                        <Input
+                          placeholder="gpt-4o-mini"
+                          value={modelId}
+                          onChange={(e) => setModelId(e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label>描述</Label>
+                        <Input
+                          placeholder="简短描述这个模型的用途"
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          className="mt-1"
+                        />
+                      </div>
+                    </>
+                  )}
                   <div className="flex items-center gap-6">
                     <div className="flex items-center gap-2">
                       <Switch
