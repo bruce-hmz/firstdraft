@@ -53,7 +53,7 @@ export default function SharePage({ params }: SharePageProps) {
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2 text-neutral-900">
             <ArrowLeft className="h-5 w-5" />
-            <span className="font-semibold">IdeaForge</span>
+            <span className="font-semibold">FirstDraft</span>
           </Link>
           <div className="flex gap-3">
             <Button variant="outline" size="sm" onClick={handleCopy}>
@@ -137,7 +137,7 @@ export default function SharePage({ params }: SharePageProps) {
 
           <div className="bg-neutral-50 p-4 text-center border-t border-neutral-100">
             <p className="text-sm text-neutral-400">
-              由 IdeaForge 生成
+              由 FirstDraft 生成
             </p>
           </div>
         </Card>

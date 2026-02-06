@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { Plus, Trash2, Edit2, Key, Database, Check } from 'lucide-react'
+import { Plus, Trash2, Edit2, Key } from 'lucide-react'
 
 interface AIModel {
   id: string
@@ -34,13 +34,6 @@ interface AIModel {
   description?: string
 }
 
-interface AdminConfig {
-  id: string
-  key: string
-  value: string
-  description?: string
-}
-
 const PROVIDERS = [
   { value: 'openai', label: 'OpenAI' },
   { value: 'anthropic', label: 'Anthropic (Claude)' },
@@ -51,12 +44,10 @@ const PROVIDERS = [
 
 export default function AdminPage() {
   const [models, setModels] = useState<AIModel[]>([])
-  const [configs, setConfigs] = useState<AdminConfig[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isModelDialogOpen, setIsModelDialogOpen] = useState(false)
   const [editingModel, setEditingModel] = useState<AIModel | null>(null)
 
-  // Form states
   const [modelName, setModelName] = useState('')
   const [provider, setProvider] = useState('openai')
   const [apiKey, setApiKey] = useState('')
@@ -66,13 +57,8 @@ export default function AdminPage() {
   const [isActive, setIsActive] = useState(true)
   const [isDefault, setIsDefault] = useState(false)
 
-  // Config form states
-  const [supabaseUrl, setSupabaseUrl] = useState('')
-  const [supabaseAnonKey, setSupabaseAnonKey] = useState('')
-
   useEffect(() => {
     fetchModels()
-    fetchConfigs()
   }, [])
 
   const fetchModels = async () => {
@@ -86,23 +72,6 @@ export default function AdminPage() {
       console.error('Failed to fetch models:', error)
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const fetchConfigs = async () => {
-    try {
-      const response = await fetch('/api/admin/config')
-      const data = await response.json()
-      if (data.success) {
-        setConfigs(data.data)
-        // Load existing values
-        const url = data.data.find((c: AdminConfig) => c.key === 'SUPABASE_URL')
-        const key = data.data.find((c: AdminConfig) => c.key === 'SUPABASE_ANON_KEY')
-        if (url) setSupabaseUrl(url.value)
-        if (key) setSupabaseAnonKey(key.value)
-      }
-    } catch (error) {
-      console.error('Failed to fetch configs:', error)
     }
   }
 
@@ -155,28 +124,6 @@ export default function AdminPage() {
     }
   }
 
-  const handleSaveConfigs = async () => {
-    try {
-      const response = await fetch('/api/admin/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          configs: [
-            { key: 'SUPABASE_URL', value: supabaseUrl, description: 'Supabase 项目 URL' },
-            { key: 'SUPABASE_ANON_KEY', value: supabaseAnonKey, description: 'Supabase 匿名密钥' },
-          ],
-        }),
-      })
-
-      if (response.ok) {
-        alert('配置已保存')
-        fetchConfigs()
-      }
-    } catch (error) {
-      console.error('Failed to save configs:', error)
-    }
-  }
-
   const resetModelForm = () => {
     setModelName('')
     setProvider('openai')
@@ -215,220 +162,180 @@ export default function AdminPage() {
       </nav>
 
       <div className="max-w-6xl mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold text-neutral-900 mb-8">系统配置</h1>
+        <h1 className="text-3xl font-bold text-neutral-900 mb-8">AI 模型配置</h1>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Supabase Config */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Supabase 配置
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="supabaseUrl">Supabase URL</Label>
-                <Input
-                  id="supabaseUrl"
-                  placeholder="https://your-project.supabase.co"
-                  value={supabaseUrl}
-                  onChange={(e) => setSupabaseUrl(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-              <div>
-                <Label htmlFor="supabaseKey">Supabase Anon Key</Label>
-                <Input
-                  id="supabaseKey"
-                  type="password"
-                  placeholder="your-anon-key"
-                  value={supabaseAnonKey}
-                  onChange={(e) => setSupabaseAnonKey(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-              <Button onClick={handleSaveConfigs} className="w-full">
-                <Check className="h-4 w-4 mr-2" />
-                保存配置
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* AI Models Management */}
-          <Card className="md:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5" />
-                AI 模型管理
-              </CardTitle>
-              <Dialog open={isModelDialogOpen} onOpenChange={setIsModelDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button onClick={resetModelForm}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    添加模型
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-lg">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {editingModel ? '编辑模型' : '添加模型'}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4 pt-4">
-                    <div>
-                      <Label>模型名称</Label>
-                      <Input
-                        placeholder="例如：OpenAI GPT-4"
-                        value={modelName}
-                        onChange={(e) => setModelName(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label>提供商</Label>
-                      <Select value={provider} onValueChange={setProvider}>
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {PROVIDERS.map((p) => (
-                            <SelectItem key={p.value} value={p.value}>
-                              {p.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>API Key</Label>
-                      <Input
-                        type="password"
-                        placeholder="sk-..."
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    {provider === 'custom' && (
-                      <div>
-                        <Label>Base URL (可选)</Label>
-                        <Input
-                          placeholder="https://api.custom.com/v1"
-                          value={baseUrl}
-                          onChange={(e) => setBaseUrl(e.target.value)}
-                          className="mt-1"
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <Label>模型 ID</Label>
-                      <Input
-                        placeholder="gpt-4o-mini"
-                        value={modelId}
-                        onChange={(e) => setModelId(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label>描述</Label>
-                      <Input
-                        placeholder="简短描述这个模型的用途"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        className="mt-1"
-                      />
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={isActive}
-                          onCheckedChange={setIsActive}
-                          id="isActive"
-                        />
-                        <Label htmlFor="isActive">启用</Label>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Switch
-                          checked={isDefault}
-                          onCheckedChange={setIsDefault}
-                          id="isDefault"
-                        />
-                        <Label htmlFor="isDefault">设为默认</Label>
-                      </div>
-                    </div>
-                    <Button
-                      onClick={handleSaveModel}
-                      disabled={!modelName || !apiKey || !modelId}
-                      className="w-full"
-                    >
-                      {editingModel ? '保存修改' : '添加模型'}
-                    </Button>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Key className="h-5 w-5" />
+              大模型管理
+            </CardTitle>
+            <Dialog open={isModelDialogOpen} onOpenChange={setIsModelDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={resetModelForm}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  添加模型
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>
+                    {editingModel ? '编辑模型' : '添加模型'}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <div>
+                    <Label>模型名称</Label>
+                    <Input
+                      placeholder="例如：OpenAI GPT-4"
+                      value={modelName}
+                      onChange={(e) => setModelName(e.target.value)}
+                      className="mt-1"
+                    />
                   </div>
-                </DialogContent>
-              </Dialog>
-            </CardHeader>
-            <CardContent>
-              {isLoading ? (
-                <div className="text-center py-8 text-neutral-500">加载中...</div>
-              ) : models.length === 0 ? (
-                <div className="text-center py-8 text-neutral-500">
-                  暂无模型配置，点击"添加模型"开始配置
+                  <div>
+                    <Label>提供商</Label>
+                    <Select value={provider} onValueChange={setProvider}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {PROVIDERS.map((p) => (
+                          <SelectItem key={p.value} value={p.value}>
+                            {p.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>API Key</Label>
+                    <Input
+                      type="password"
+                      placeholder="sk-..."
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  {provider === 'custom' && (
+                    <div>
+                      <Label>Base URL (可选)</Label>
+                      <Input
+                        placeholder="https://api.custom.com/v1"
+                        value={baseUrl}
+                        onChange={(e) => setBaseUrl(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <Label>模型 ID</Label>
+                    <Input
+                      placeholder="gpt-4o-mini"
+                      value={modelId}
+                      onChange={(e) => setModelId(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label>描述</Label>
+                    <Input
+                      placeholder="简短描述这个模型的用途"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={isActive}
+                        onCheckedChange={setIsActive}
+                        id="isActive"
+                      />
+                      <Label htmlFor="isActive">启用</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={isDefault}
+                        onCheckedChange={setIsDefault}
+                        id="isDefault"
+                      />
+                      <Label htmlFor="isDefault">设为默认</Label>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={handleSaveModel}
+                    disabled={!modelName || !apiKey || !modelId}
+                    className="w-full"
+                  >
+                    {editingModel ? '保存修改' : '添加模型'}
+                  </Button>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  {models.map((model) => (
-                    <div
-                      key={model.id}
-                      className="flex items-center justify-between p-4 bg-white border rounded-lg"
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <span className="font-medium">{model.name}</span>
-                          {model.isDefault && (
-                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-                              默认
-                            </span>
-                          )}
-                          {!model.isActive && (
-                            <span className="text-xs bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded">
-                              已停用
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-neutral-500 mt-1">
-                          {PROVIDERS.find((p) => p.value === model.provider)?.label || model.provider} · {model.modelId}
-                        </p>
-                        {model.description && (
-                          <p className="text-xs text-neutral-400 mt-1">
-                            {model.description}
-                          </p>
+              </DialogContent>
+            </Dialog>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="text-center py-8 text-neutral-500">加载中...</div>
+            ) : models.length === 0 ? (
+              <div className="text-center py-8 text-neutral-500">
+                暂无模型配置，点击右上角"添加模型"开始配置
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {models.map((model) => (
+                  <div
+                    key={model.id}
+                    className="flex items-center justify-between p-4 bg-white border rounded-lg"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <span className="font-medium">{model.name}</span>
+                        {model.isDefault && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                            默认
+                          </span>
+                        )}
+                        {!model.isActive && (
+                          <span className="text-xs bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded">
+                            已停用
+                          </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openEditDialog(model)}
-                        >
-                          <Edit2 className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteModel(model.id)}
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <p className="text-sm text-neutral-500 mt-1">
+                        {PROVIDERS.find((p) => p.value === model.provider)?.label || model.provider} · {model.modelId}
+                      </p>
+                      {model.description && (
+                        <p className="text-xs text-neutral-400 mt-1">
+                          {model.description}
+                        </p>
+                      )}
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openEditDialog(model)}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteModel(model.id)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </main>
   )

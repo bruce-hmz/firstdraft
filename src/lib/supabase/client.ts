@@ -6,13 +6,9 @@ export function createClient() {
 
   if (!url || !anonKey) {
     throw new Error(
-      'Supabase configuration not found. Please configure it in the admin panel.'
+      'Supabase configuration missing. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local'
     )
   }
 
   return createBrowserClient(url, anonKey)
-}
-
-export function isSupabaseConfigured() {
-  return !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 }

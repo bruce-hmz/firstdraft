@@ -143,7 +143,7 @@ export const useAppStore = create<AppState>()(
       setUser: (user) => set({ user }),
     }),
     {
-      name: 'ideaforge-storage',
+      name: 'firstdraft-storage',
       partialize: (state) => ({ 
         generationFlow: state.generationFlow,
         user: state.user,

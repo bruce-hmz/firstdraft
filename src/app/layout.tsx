@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "IdeaForge - 10分钟把你的想法变成产品",
-  description: "AI驱动的产品页面生成器，让非技术创业者快速验证想法",
+  title: "FirstDraft - 把一个模糊的想法，变成真实存在的第一稿",
+  description: "Turn your first idea into something real. AI驱动的产品页面生成器，几分钟内生成可分享的产品页面。",
 };
 
 export default function RootLayout({

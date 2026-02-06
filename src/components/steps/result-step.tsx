@@ -124,7 +124,7 @@ export function ResultStep() {
 
           <div className="bg-neutral-50 p-4 text-center border-t border-neutral-100">
             <p className="text-sm text-neutral-400">
-              由 IdeaForge 生成
+              由 FirstDraft 生成
             </p>
           </div>
         </Card>
