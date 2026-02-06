@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/lib/supabase/server'
 
 export async function GET() {
   try {
-    const models = await prisma.aIModel.findMany({
-      orderBy: { createdAt: 'desc' },
-    })
+    const supabase = await createClient()
+    const { data: models, error } = await supabase
+      .from('ai_models')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
 
     return NextResponse.json({ success: true, data: models })
   } catch (error) {
@@ -22,25 +26,33 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { name, provider, apiKey, baseUrl, modelId, description, isActive, isDefault } = body
 
+    const supabase = await createClient()
+
     if (isDefault) {
-      await prisma.aIModel.updateMany({
-        where: { isDefault: true },
-        data: { isDefault: false },
-      })
+      // 先取消其他默认模型
+      const { error: updateError } = await supabase
+        .from('ai_models')
+        .update({ is_default: false })
+        .eq('is_default', true)
+      if (updateError) throw updateError
     }
 
-    const model = await prisma.aIModel.create({
-      data: {
+    const { data: model, error } = await supabase
+      .from('ai_models')
+      .insert({
         name,
         provider,
-        apiKey,
-        baseUrl,
-        modelId,
+        api_key: apiKey,
+        base_url: baseUrl,
+        model_id: modelId,
         description,
-        isActive,
-        isDefault,
-      },
-    })
+        is_active: isActive,
+        is_default: isDefault,
+      })
+      .select()
+      .single()
+
+    if (error) throw error
 
     return NextResponse.json({ success: true, data: model })
   } catch (error) {

@@ -3,35 +3,58 @@ import OpenAI from 'openai'
 import { nanoid } from 'nanoid'
 import { generateQuestionsPrompt, parseAIResponse } from '@/lib/prompts'
 import { GenerateQuestionsRequest, GenerateQuestionsResponse } from '@/types'
-import { prisma } from '@/lib/prisma'
+import { createClient as createSupabase } from '@/lib/supabase/server'
+
+interface AIModel {
+  id: string
+  provider: string
+  api_key: string
+  base_url: string | null
+  model_id: string
+  is_active: boolean
+  is_default: boolean
+  created_at: string
+}
 
 async function getOpenAIClient() {
-  const model = await prisma.aIModel.findFirst({
-    where: { isActive: true, isDefault: true },
-  })
+  const supabase = await createSupabase()
+  
+  const { data: model, error } = await supabase
+    .from('ai_models')
+    .select('*')
+    .eq('is_active', true)
+    .eq('is_default', true)
+    .maybeSingle()
+
+  if (error) throw error
 
   if (!model) {
-    const fallback = await prisma.aIModel.findFirst({
-      where: { isActive: true },
-      orderBy: { createdAt: 'desc' },
-    })
+    const { data: fallback, error: fallbackError } = await supabase
+      .from('ai_models')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (fallbackError) throw fallbackError
     if (!fallback) {
       throw new Error('未配置 AI 模型，请先前往管理后台配置')
     }
-    return createClient(fallback)
+    return createAIClient(fallback)
   }
 
-  return createClient(model)
+  return createAIClient(model)
 }
 
-function createClient(model: { provider: string; apiKey: string; baseUrl: string | null; modelId: string }) {
+function createAIClient(model: AIModel) {
   if (model.provider === 'openai' || model.provider === 'custom') {
     return {
       client: new OpenAI({
-        apiKey: model.apiKey,
-        baseURL: model.baseUrl || undefined,
+        apiKey: model.api_key,
+        baseURL: model.base_url || undefined,
       }),
-      modelId: model.modelId,
+      modelId: model.model_id,
     }
   }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { createClient } from '@/lib/supabase/server'
 
 export async function PUT(
   request: NextRequest,
@@ -10,26 +10,35 @@ export async function PUT(
     const body = await request.json()
     const { name, provider, apiKey, baseUrl, modelId, description, isActive, isDefault } = body
 
+    const supabase = await createClient()
+
     if (isDefault) {
-      await prisma.aIModel.updateMany({
-        where: { isDefault: true, id: { not: id } },
-        data: { isDefault: false },
-      })
+      // 先取消其他默认模型
+      const { error: updateError } = await supabase
+        .from('ai_models')
+        .update({ is_default: false })
+        .eq('is_default', true)
+        .neq('id', id)
+      if (updateError) throw updateError
     }
 
-    const model = await prisma.aIModel.update({
-      where: { id },
-      data: {
+    const { data: model, error } = await supabase
+      .from('ai_models')
+      .update({
         name,
         provider,
-        apiKey,
-        baseUrl,
-        modelId,
+        api_key: apiKey,
+        base_url: baseUrl,
+        model_id: modelId,
         description,
-        isActive,
-        isDefault,
-      },
-    })
+        is_active: isActive,
+        is_default: isDefault,
+      })
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
 
     return NextResponse.json({ success: true, data: model })
   } catch (error) {
@@ -47,9 +56,14 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
-    await prisma.aIModel.delete({
-      where: { id },
-    })
+    const supabase = await createClient()
+
+    const { error } = await supabase
+      .from('ai_models')
+      .delete()
+      .eq('id', id)
+
+    if (error) throw error
 
     return NextResponse.json({ success: true })
   } catch (error) {
