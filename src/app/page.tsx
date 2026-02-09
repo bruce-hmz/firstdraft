@@ -19,14 +19,14 @@ export default function Home() {
       <div className="max-w-4xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold text-neutral-900 mb-6">
-            把一个模糊的想法
+            那个让你夜不能寐的想法
             <br />
-            变成真实存在的第一稿
+            终于可以见人了
           </h1>
           <p className="text-xl text-neutral-600 max-w-2xl mx-auto">
-            Turn your first idea into something real.
+            别让好想法烂在脑子里。
             <br />
-            输入想法，几分钟内生成可分享的产品页面。
+            3分钟，给它一个像样的家。
           </p>
         </div>
 
@@ -37,9 +37,9 @@ export default function Home() {
             <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Clock className="h-6 w-6 text-neutral-700" />
             </div>
-            <h3 className="font-semibold text-neutral-900 mb-2">几分钟完成</h3>
+            <h3 className="font-semibold text-neutral-900 mb-2">再等等就凉了</h3>
             <p className="text-neutral-600 text-sm">
-              从想法到产品页面只需几分钟，省去 weeks 的设计和开发
+              好想法经不起拖延。趁热打铁，现在就给它一个体面的开始
             </p>
           </div>
 
@@ -47,9 +47,9 @@ export default function Home() {
             <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Zap className="h-6 w-6 text-neutral-700" />
             </div>
-            <h3 className="font-semibold text-neutral-900 mb-2">AI 驱动</h3>
+            <h3 className="font-semibold text-neutral-900 mb-2">它懂你的欲言又止</h3>
             <p className="text-neutral-600 text-sm">
-              智能分析你的产品想法，生成专业的文案和结构
+              不用你绞尽脑汁组织语言，AI 帮你把心里话说得漂亮
             </p>
           </div>
 
@@ -57,9 +57,9 @@ export default function Home() {
             <div className="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center mx-auto mb-4">
               <Share2 className="h-6 w-6 text-neutral-700" />
             </div>
-            <h3 className="font-semibold text-neutral-900 mb-2">一键分享</h3>
+            <h3 className="font-semibold text-neutral-900 mb-2">让世界看看你的野心</h3>
             <p className="text-neutral-600 text-sm">
-              生成可分享的链接，快速获得反馈和验证
+              一个链接就够了。发给朋友、投资人，或者那个一直支持你的家人
             </p>
           </div>
         </div>

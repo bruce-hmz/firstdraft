@@ -19,25 +19,29 @@ export default function SharePage({ params }: SharePageProps) {
   
   const result = {
     productName: '示例产品',
-    tagline: '这是一个示例产品页面',
-    description: '这里是产品描述',
+    tagline: '终于有人懂我们的难处了',
+    description: '这不是又一个工具，而是真正理解我们处境的伙伴',
     problemSection: {
-      headline: '问题标题',
-      description: '问题描述',
-      painPoints: ['痛点1', '痛点2', '痛点3'],
+      headline: '你是不是也经历过这些',
+      description: '每次都告诉自己下次会更好，但下次还是一样。我们不是不够努力，只是用错了方法。',
+      painPoints: [
+        '深夜还在整理客户信息，明天又要面对同样的混乱',
+        '团队开会各说各的，散会后谁也不知道该干嘛',
+        '想给宝宝留下美好回忆，结果被各种APP搞得焦头烂额'
+      ],
     },
     solutionSection: {
-      headline: '解决方案',
-      description: '解决方案描述',
+      headline: '这次，真的不一样了',
+      description: '我们花了无数个夜晚，终于找到了那个让一切变得简单的答案。不是什么黑科技，就是真正懂你的设计。',
       features: [
-        { title: '功能1', description: '功能1描述', icon: '✨' },
-        { title: '功能2', description: '功能2描述', icon: '🚀' },
-        { title: '功能3', description: '功能3描述', icon: '💡' },
+        { title: '它记得你忘记的', description: '客户信息、项目进度，自动整理，再也不用手忙脚乱', icon: '🧠' },
+        { title: '让对话回到正轨', description: '不是又一个聊天工具，而是让团队真正在协作的平台', icon: '💬' },
+        { title: '温暖不麻烦', description: '一个按钮记录成长，剩下的时间用来陪伴而不是操作', icon: '🌱' },
       ],
     },
     ctaSection: {
-      text: '立即开始',
-      subtext: '免费试用，无需信用卡',
+      text: '给自己一个机会',
+      subtext: '先试试看，不喜欢随时离开，我们不挽留',
     },
   };
 

@@ -9,9 +9,9 @@ import { useAppStore } from '@/stores/app-store';
 import { useRouter } from 'next/navigation';
 
 const exampleIdeas = [
-  '一个帮助自由职业者管理客户和项目的工具',
-  '让远程团队更有效协作的社交平台',
-  '帮助新手父母记录宝宝成长的应用',
+  '每次接新项目都手忙脚乱，想要一个不让自己那么狼狈的工具',
+  '远程开会总是各说各的，想要一个让团队真正在聊天的平台',
+  '宝宝长得太快，怕忘记那些第一次，想要一个温暖的记录方式',
 ];
 
 export function IdeaInputSection() {
@@ -69,7 +69,7 @@ export function IdeaInputSection() {
           <Textarea
             value={idea}
             onChange={(e) => setIdea(e.target.value)}
-            placeholder="描述你的产品想法..."
+            placeholder="那个让你兴奋又害怕的想法，说来听听..."
             className="min-h-[160px] text-lg p-6 resize-none border-2 border-neutral-200 focus:border-neutral-400 rounded-2xl bg-white/50 backdrop-blur-sm"
             disabled={isSubmitting}
           />
