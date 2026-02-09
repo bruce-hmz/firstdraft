@@ -1,48 +1,84 @@
 'use client';
 
-import { useAppStore } from '@/stores/app-store';
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { createBrowserClient } from '@supabase/ssr';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Copy, Check, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
-import Link from 'next/link';
+import { Copy, Check, ArrowLeft, Loader2 } from 'lucide-react';
+import type { PageContent } from '@/types';
 
 interface SharePageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
+}
+
+interface PageData {
+  id: string;
+  slug: string;
+  title: string;
+  content: PageContent;
+  view_count: number;
+  created_at: string;
 }
 
 export default function SharePage({ params }: SharePageProps) {
+  const [slug, setSlug] = useState<string>('');
+  const [pageData, setPageData] = useState<PageData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  
-  const result = {
-    productName: '示例产品',
-    tagline: '终于有人懂我们的难处了',
-    description: '这不是又一个工具，而是真正理解我们处境的伙伴',
-    problemSection: {
-      headline: '你是不是也经历过这些',
-      description: '每次都告诉自己下次会更好，但下次还是一样。我们不是不够努力，只是用错了方法。',
-      painPoints: [
-        '深夜还在整理客户信息，明天又要面对同样的混乱',
-        '团队开会各说各的，散会后谁也不知道该干嘛',
-        '想给宝宝留下美好回忆，结果被各种APP搞得焦头烂额'
-      ],
-    },
-    solutionSection: {
-      headline: '这次，真的不一样了',
-      description: '我们花了无数个夜晚，终于找到了那个让一切变得简单的答案。不是什么黑科技，就是真正懂你的设计。',
-      features: [
-        { title: '它记得你忘记的', description: '客户信息、项目进度，自动整理，再也不用手忙脚乱', icon: '🧠' },
-        { title: '让对话回到正轨', description: '不是又一个聊天工具，而是让团队真正在协作的平台', icon: '💬' },
-        { title: '温暖不麻烦', description: '一个按钮记录成长，剩下的时间用来陪伴而不是操作', icon: '🌱' },
-      ],
-    },
-    ctaSection: {
-      text: '给自己一个机会',
-      subtext: '先试试看，不喜欢随时离开，我们不挽留',
-    },
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setSlug(resolvedParams.slug);
+      fetchPageData(resolvedParams.slug);
+    });
+  }, [params]);
+
+  const fetchPageData = async (pageSlug: string) => {
+    console.log('Fetching page data for slug:', pageSlug);
+    
+    try {
+      setLoading(true);
+
+      const { data, error } = await supabase
+        .from('pages')
+        .select('*')
+        .eq('slug', pageSlug)
+        .eq('status', 'active')
+        .single();
+
+      console.log('Supabase query result:', { data, error });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        if (error.code === 'PGRST116') {
+          setError('PAGE_NOT_FOUND');
+        } else {
+          setError('FETCH_ERROR');
+        }
+        return;
+      }
+
+      console.log('Page data found:', data);
+      setPageData(data as PageData);
+
+      // Increment view count asynchronously
+      supabase.rpc('increment_view_count', { page_slug: pageSlug })
+    } catch (err) {
+      console.error('Failed to fetch page:', err);
+      setError('FETCH_ERROR');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCopy = async () => {
@@ -50,6 +86,42 @@ export default function SharePage({ params }: SharePageProps) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <Loader2 className="h-8 w-8 animate-spin text-neutral-400" />
+      </div>
+    );
+  }
+
+  if (error === 'PAGE_NOT_FOUND') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-neutral-900 mb-4">404</h1>
+          <p className="text-neutral-600 mb-6">页面不存在或已被删除</p>
+          <Link href="/">
+            <Button>返回首页</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !pageData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-neutral-900 mb-4">出错了</h1>
+          <p className="text-neutral-600 mb-6">请刷新页面重试</p>
+          <Button onClick={() => window.location.reload()}>刷新</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const { content } = pageData;
 
   return (
     <div className="min-h-screen bg-white">
@@ -86,22 +158,22 @@ export default function SharePage({ params }: SharePageProps) {
             <Badge variant="secondary" className="mb-4 bg-white/10 text-white border-0">
               新产品
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">{result.productName}</h1>
-            <p className="text-xl text-neutral-300 mb-2">{result.tagline}</p>
-            <p className="text-neutral-400 max-w-lg mx-auto">{result.description}</p>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{content.productName}</h1>
+            <p className="text-xl text-neutral-300 mb-2">{content.tagline}</p>
+            <p className="text-neutral-400 max-w-lg mx-auto">{content.description}</p>
           </div>
 
           <div className="p-12">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-2xl font-bold text-neutral-900 mb-4">
-                {result.problemSection.headline}
+                {content.problemSection.headline}
               </h2>
               <p className="text-neutral-600 mb-8 leading-relaxed">
-                {result.problemSection.description}
+                {content.problemSection.description}
               </p>
 
               <div className="space-y-4 mb-12">
-                {result.problemSection.painPoints.map((point, index) => (
+                {content.problemSection.painPoints.map((point, index) => (
                   <div key={index} className="flex items-start gap-3">
                     <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                       <span className="text-red-600 text-sm">✕</span>
@@ -112,14 +184,14 @@ export default function SharePage({ params }: SharePageProps) {
               </div>
 
               <h2 className="text-2xl font-bold text-neutral-900 mb-4">
-                {result.solutionSection.headline}
+                {content.solutionSection.headline}
               </h2>
               <p className="text-neutral-600 mb-8">
-                {result.solutionSection.description}
+                {content.solutionSection.description}
               </p>
 
               <div className="grid md:grid-cols-3 gap-6 mb-12">
-                {result.solutionSection.features.map((feature, index) => (
+                {content.solutionSection.features.map((feature, index) => (
                   <Card key={index} className="p-6 border border-neutral-100">
                     <div className="text-3xl mb-3">{feature.icon}</div>
                     <h3 className="font-semibold text-neutral-900 mb-2">{feature.title}</h3>
@@ -130,10 +202,10 @@ export default function SharePage({ params }: SharePageProps) {
 
               <div className="text-center p-8 bg-neutral-50 rounded-2xl">
                 <Button size="lg" className="bg-neutral-900 hover:bg-neutral-800 text-white px-8">
-                  {result.ctaSection.text}
+                  {content.ctaSection.text}
                 </Button>
-                {result.ctaSection.subtext && (
-                  <p className="text-sm text-neutral-500 mt-3">{result.ctaSection.subtext}</p>
+                {content.ctaSection.subtext && (
+                  <p className="text-sm text-neutral-500 mt-3">{content.ctaSection.subtext}</p>
                 )}
               </div>
             </div>

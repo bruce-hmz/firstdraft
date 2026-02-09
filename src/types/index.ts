@@ -108,6 +108,45 @@ export const ErrorCodes = {
   UPGRADE_REQUIRED: 'UPGRADE_REQUIRED',
   GENERATION_LIMIT_REACHED: 'GENERATION_LIMIT_REACHED',
   PROJECT_NOT_FOUND: 'PROJECT_NOT_FOUND',
+  PAGE_NOT_FOUND: 'PAGE_NOT_FOUND',
   AI_GENERATION_FAILED: 'AI_GENERATION_FAILED',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 } as const;
+
+// ==========================================
+// Database Types (for Supabase)
+// ==========================================
+
+export interface PageDbModel {
+  id: string;
+  slug: string;
+  title: string;
+  content: PageContent;
+  metadata: PageMetadata;
+  status: PageStatus;
+  view_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type PageStatus = 'active' | 'deleted' | 'archived';
+
+export interface PageMetadata {
+  template?: string;
+  version?: string;
+  ai_model?: string;
+  [key: string]: unknown;
+}
+
+export interface CreatePageInput {
+  title: string;
+  content: PageContent;
+  metadata?: PageMetadata;
+}
+
+export interface SharePageResponse {
+  slug: string;
+  shareUrl: string;
+  viewCount: number;
+  createdAt: string;
+}

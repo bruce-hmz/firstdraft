@@ -5,26 +5,127 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/stores/app-store';
-import { Copy, Check, RefreshCw, Download, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Copy, Check, RefreshCw, Download, Sparkles, Loader2, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { createBrowserClient } from '@supabase/ssr';
 
 export function ResultStep() {
   const {
-    generationFlow: { result, shareUrl },
+    generationFlow: { result, shareUrl, idea },
+    setResult,
     resetFlow,
   } = useAppStore();
 
   const [copied, setCopied] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [currentShareUrl, setCurrentShareUrl] = useState<string | null>(shareUrl);
+  const [currentSlug, setCurrentSlug] = useState<string | null>(null);
 
-  if (!result) return null;
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
 
-  const handleCopy = async () => {
+  // Check if saved page exists in database
+  useEffect(() => {
     if (shareUrl) {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      const slug = shareUrl.split('/share/')[1];
+      setCurrentSlug(slug);
+      verifyPageExists(slug);
+    }
+  }, [shareUrl]);
+
+  const verifyPageExists = async (slug: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('pages')
+        .select('id')
+        .eq('slug', slug)
+        .eq('status', 'active')
+        .single();
+
+      if (error || !data) {
+        console.log('Page not found in database, need to save again');
+        setCurrentShareUrl(null);
+        setCurrentSlug(null);
+      }
+    } catch (e) {
+      console.log('Verification failed:', e);
+      setCurrentShareUrl(null);
+      setCurrentSlug(null);
     }
   };
+
+  const handleSaveAndShare = async () => {
+    console.log('Starting save and share process...');
+    if (saving || !result) return;
+
+    try {
+      setSaving(true);
+
+      const response = await fetch('/api/share', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: result.productName,
+          content: result,
+          metadata: {
+            originalIdea: idea,
+            template: 'default',
+          },
+        }),
+      });
+
+      console.log('API response status:', response.status);
+
+      const data = await response.json();
+      console.log('API response:', JSON.stringify(data, null, 2));
+
+      if (data.success && data.data) {
+        const newShareUrl = data.data.shareUrl;
+        const newSlug = data.data.slug;
+        console.log('✅ Save successful! Slug:', newSlug);
+        setCurrentShareUrl(newShareUrl);
+        setCurrentSlug(newSlug);
+        setResult(result, newSlug, newShareUrl);
+
+        // 自动复制（如果失败则显示提示）
+        try {
+          await navigator.clipboard.writeText(newShareUrl);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch (clipboardError) {
+          console.log('Clipboard copy failed, user can copy manually');
+          // 不提示错误，让用户手动点击复制按钮
+        }
+      } else {
+        console.error('❌ Save failed:', data.error);
+        alert('保存失败: ' + (data.error?.message || '未知错误'));
+      }
+    } catch (error) {
+      console.error('❌ Exception:', error);
+      alert('保存失败: ' + error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (!currentShareUrl) return;
+    
+    try {
+      await navigator.clipboard.writeText(currentShareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (e) {
+      alert('复制失败，请手动复制链接: ' + currentShareUrl);
+    }
+  };
+
+  if (!result) return null;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
@@ -42,16 +143,19 @@ export function ResultStep() {
             <RefreshCw className="mr-2 h-4 w-4" />
             重新开始
           </Button>
-          <Button onClick={handleCopy} variant={copied ? 'secondary' : 'default'}>
-            {copied ? (
+          <Button
+            onClick={handleSaveAndShare}
+            disabled={saving}
+          >
+            {saving ? (
               <>
-                <Check className="mr-2 h-4 w-4" />
-                已复制
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                保存中...
               </>
             ) : (
               <>
-                <Copy className="mr-2 h-4 w-4" />
-                复制链接
+                <Save className="mr-2 h-4 w-4" />
+                保存并分享
               </>
             )}
           </Button>
@@ -129,6 +233,35 @@ export function ResultStep() {
           </div>
         </Card>
       </motion.div>
+
+      {currentShareUrl && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex justify-center gap-4"
+        >
+          <Link href={currentShareUrl} target="_blank">
+            <Button variant="outline" className="gap-2">
+              <Sparkles className="h-4 w-4" />
+              预览分享页面
+            </Button>
+          </Link>
+          <Button variant="outline" onClick={handleCopy}>
+            {copied ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                已复制
+              </>
+            ) : (
+              <>
+                <Copy className="mr-2 h-4 w-4" />
+                复制链接
+              </>
+            )}
+          </Button>
+        </motion.div>
+      )}
 
       <div className="flex justify-center gap-4">
         <Button variant="outline" className="gap-2">
