@@ -1,13 +1,6 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 
-/**
- * Admin API 专用的 Supabase client
- * 使用 SERVICE ROLE KEY 绕过 RLS 策略
- */
-export async function createAdminClient() {
-  const cookieStore = await cookies()
-
+export function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -17,16 +10,10 @@ export async function createAdminClient() {
     )
   }
 
-  return createServerClient(url, serviceRoleKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll()
-      },
-      setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value, options }) => {
-          cookieStore.set(name, value, options)
-        })
-      },
-    },
+  return createSupabaseClient(url, serviceRoleKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
   })
 }

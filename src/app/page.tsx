@@ -1,7 +1,15 @@
+'use client'
+
+import { useState } from 'react'
 import { IdeaInputSection } from '@/components/sections/idea-input-section'
+import { ExampleIdeas } from '@/components/sections/example-ideas'
+import { UserButton } from '@/components/auth/user-button'
 import { Sparkles, Zap, Clock, Share2 } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Home() {
+  const [selectedIdea, setSelectedIdea] = useState<string>('')
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-neutral-50 to-white">
       <nav className="w-full px-6 py-4 flex justify-between items-center border-b border-neutral-100">
@@ -10,9 +18,10 @@ export default function Home() {
           <span className="text-xl font-bold text-neutral-900">FirstDraft</span>
         </div>
         <div className="flex items-center gap-4">
-          <a href="/admin" className="text-neutral-600 hover:text-neutral-900 hidden sm:block">
+          <Link href="/admin" className="text-neutral-600 hover:text-neutral-900 hidden sm:block">
             管理后台
-          </a>
+          </Link>
+          <UserButton />
         </div>
       </nav>
 
@@ -30,7 +39,9 @@ export default function Home() {
           </p>
         </div>
 
-        <IdeaInputSection />
+        <IdeaInputSection key={selectedIdea} initialIdea={selectedIdea} />
+
+        <ExampleIdeas onSelectIdea={setSelectedIdea} />
 
         <div className="grid md:grid-cols-3 gap-8 mt-20">
           <div className="text-center p-6">

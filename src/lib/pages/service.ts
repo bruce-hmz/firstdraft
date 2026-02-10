@@ -12,25 +12,38 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 const PAGE_TABLE = 'pages'
 
-export async function createPage(input: CreatePageInput): Promise<PageDbModel | null> {
+export async function createPage(input: CreatePageInput & { userId?: string; anonymousId?: string }): Promise<PageDbModel | null> {
+  console.log('Creating page with input:', { title: input.title, hasUser: !!input.userId, hasAnonymous: !!input.anonymousId })
+  
   const slug = await generateUniqueSlug()
+  console.log('Generated slug:', slug)
+
+  const insertData = {
+    slug,
+    title: input.title,
+    content: input.content,
+    metadata: input.metadata || {},
+    user_id: input.userId || null,
+    anonymous_id: input.anonymousId || null,
+  }
+  
+  console.log('Inserting data:', JSON.stringify(insertData, null, 2))
 
   const { data, error } = await supabase
     .from(PAGE_TABLE)
-    .insert({
-      slug,
-      title: input.title,
-      content: input.content,
-      metadata: input.metadata || {},
-    })
+    .insert(insertData)
     .select()
     .single()
 
   if (error) {
     console.error('Failed to create page:', error)
-    throw new Error(`Failed to create page: ${error.message}`)
+    console.error('Error code:', error.code)
+    console.error('Error message:', error.message)
+    console.error('Error details:', error.details)
+    throw new Error(`Failed to create page: ${error.message} (code: ${error.code})`)
   }
 
+  console.log('Page created successfully:', data?.id)
   return data as PageDbModel
 }
 
@@ -61,11 +74,17 @@ export async function incrementViewCount(slug: string): Promise<void> {
   }
 }
 
-export async function deletePage(id: string): Promise<boolean> {
-  const { error } = await supabase
+export async function deletePage(id: string, userId?: string): Promise<boolean> {
+  let query = supabase
     .from(PAGE_TABLE)
     .update({ status: 'deleted' })
     .eq('id', id)
+
+  if (userId) {
+    query = query.eq('user_id', userId)
+  }
+
+  const { error } = await query
 
   if (error) {
     console.error('Failed to delete page:', error)
@@ -102,6 +121,25 @@ export async function getRecentPages(limit = 10): Promise<PageDbModel[]> {
   if (error) {
     console.error('Failed to get recent pages:', error)
     throw new Error(`Failed to get recent pages: ${error.message}`)
+  }
+
+  return (data || []) as PageDbModel[]
+}
+
+export async function getUserPages(userId: string, options: { limit?: number; offset?: number } = {}): Promise<PageDbModel[]> {
+  const { limit = 20, offset = 0 } = options
+
+  const { data, error } = await supabase
+    .from(PAGE_TABLE)
+    .select('*')
+    .eq('user_id', userId)
+    .neq('status', 'deleted')
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1)
+
+  if (error) {
+    console.error('Failed to get user pages:', error)
+    throw new Error(`Failed to get user pages: ${error.message}`)
   }
 
   return (data || []) as PageDbModel[]

@@ -12,6 +12,31 @@ export interface QuestionTemplate {
 
 // 精细化场景模板
 const QUESTION_TEMPLATES: QuestionTemplate[] = [
+  // 开发者/编程工具类
+  {
+    keywords: ['开发者', '代码', '编程', '开发', '程序员', '工程师', '技术', 'API', ' snippet', 'git'],
+    questions: [
+      {
+        id: 'target_user',
+        question: '你的工具主要服务什么样的开发者？',
+        placeholder: '描述目标开发者的类型和工作场景...',
+        example: '经常需要复用代码的前端工程师、学习编程的初学者、管理多个项目的技术负责人',
+      },
+      {
+        id: 'pain_point',
+        question: '他们在写代码或管理代码时最常遇到什么麻烦？',
+        placeholder: '描述开发工作流中的具体痛点...',
+        example: '以前写的代码片段找不到、团队里重复造轮子、不同项目间复制粘贴代码容易出错',
+      },
+      {
+        id: 'unique_value',
+        question: '你的产品如何让代码管理和复用变得更高效？',
+        placeholder: '说明核心功能和开发者体验优势...',
+        example: '一键保存和搜索代码片段、支持多种语言和IDE集成、团队共享代码库避免重复开发',
+      },
+    ],
+  },
+
   // 亲子/育儿类
   {
     keywords: ['宝宝', '婴儿', '育儿', '孩子', '成长记录', '宝妈', '奶爸', '亲子'],
@@ -189,25 +214,25 @@ const QUESTION_TEMPLATES: QuestionTemplate[] = [
 
   // 睡眠/健康类
   {
-    keywords: ['睡眠', '失眠', '助眠', '白噪音', '冥想', '放松', '休息'],
+    keywords: ['睡眠', '失眠', '助眠', '白噪音', '冥想', '放松', '休息', '追踪', '监测', '健康'],
     questions: [
       {
         id: 'target_user',
         question: '你的睡眠应用主要帮助什么样的用户？',
         placeholder: '描述目标用户的睡眠问题...',
-        example: '熬夜失眠的上班族、焦虑睡不着的年轻人、需要改善睡眠质量的老年人',
+        example: '想了解睡眠质量的上班族、有睡眠障碍需要监测的人、想通过数据改善作息的健康爱好者',
       },
       {
         id: 'pain_point',
-        question: '他们通常在睡前或睡眠中遇到什么困扰？',
-        placeholder: '描述睡眠的具体问题...',
-        example: '躺下后思绪万千睡不着、半夜易醒再难入睡、不知道睡眠质量如何',
+        question: '他们在了解或改善睡眠时遇到什么困难？',
+        placeholder: '描述睡眠监测或改善的具体问题...',
+        example: '不知道自己睡眠质量如何、手动记录睡眠太麻烦、看不懂睡眠数据不知道该怎么改善',
       },
       {
         id: 'unique_value',
-        question: '你的产品如何帮助他们改善睡眠质量？',
-        placeholder: '说明助眠机制和数据反馈...',
-        example: '个性化白噪音和冥想引导、睡眠周期分析、睡前放松计划',
+        question: '你的产品如何帮助他们更好地了解和改善睡眠？',
+        placeholder: '说明监测方式和个性化建议...',
+        example: '自动监测睡眠周期无需手动记录、AI分析睡眠数据给出改善建议、根据睡眠规律智能提醒最佳入睡时间',
       },
     ],
   },

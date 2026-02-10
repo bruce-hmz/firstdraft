@@ -11,14 +11,15 @@ import Link from 'next/link';
 
 export function ResultStep() {
   const {
-    generationFlow: { result, shareUrl, idea },
+    generationFlow: { result, shareUrl, idea, projectId },
     setResult,
     resetFlow,
   } = useAppStore();
 
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [currentShareUrl, setCurrentShareUrl] = useState(shareUrl);
+  // 只有当有 projectId 时才使用已保存的 shareUrl，否则需要重新保存
+  const [currentShareUrl, setCurrentShareUrl] = useState(projectId ? shareUrl : '');
 
   if (!result) return null;
 
@@ -42,6 +43,7 @@ export function ResultStep() {
             originalIdea: idea,
             template: 'default',
           },
+          anonymousId: `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         }),
       });
 
@@ -61,7 +63,9 @@ export function ResultStep() {
         setTimeout(() => setCopied(false), 2000);
       } else {
         console.error('✗ Failed to save page:', data.error);
-        alert('保存失败: ' + (data.error?.message || '请检查控制台日志'));
+        const errorMsg = data.error?.message || '未知错误';
+        const errorDetails = data.error?.details ? '\n\n详细信息: ' + data.error.details : '';
+        alert('保存失败: ' + errorMsg + errorDetails + '\n\n请检查浏览器控制台(F12)查看详细日志');
       }
     } catch (error) {
       console.error('✗ Exception during save:', error);

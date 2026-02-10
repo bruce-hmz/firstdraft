@@ -99,16 +99,11 @@ export async function POST(request: NextRequest) {
     }
 
     const pageContent = parseAIResponse<PageContent>(content)
-    const projectId = `proj_${nanoid(10)}`
-    const slug = nanoid(8)
-    const shareUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/share/${slug}`
 
     return NextResponse.json({
       success: true,
       data: {
-        projectId,
         page: pageContent,
-        shareUrl,
         isPro: false,
       },
     })

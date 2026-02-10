@@ -125,6 +125,8 @@ export interface PageDbModel {
   metadata: PageMetadata;
   status: PageStatus;
   view_count: number;
+  user_id?: string;
+  anonymous_id?: string;
   created_at: string;
   updated_at: string;
 }
@@ -142,6 +144,8 @@ export interface CreatePageInput {
   title: string;
   content: PageContent;
   metadata?: PageMetadata;
+  userId?: string;
+  anonymousId?: string;
 }
 
 export interface SharePageResponse {

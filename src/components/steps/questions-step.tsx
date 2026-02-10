@@ -24,6 +24,26 @@ export function QuestionsStep() {
   const [optimizeStatus, setOptimizeStatus] = useState<'idle' | 'loading' | 'success' | 'timeout'>('idle');
   const currentQuestion = questions[currentIndex];
 
+  // 如果 questions 为空，根据 idea 获取预设问题
+  useEffect(() => {
+    if (questions.length === 0 && idea) {
+      fetch('/api/generate/questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idea }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.data?.questions) {
+            setQuestions(data.data.questions);
+          }
+        })
+        .catch((err) => {
+          console.error('获取问题失败:', err);
+        });
+    }
+  }, [questions, idea, setQuestions]);
+
   useEffect(() => {
     setCurrentIndex(0);
     setOptimizeStatus('idle');
@@ -103,7 +123,7 @@ export function QuestionsStep() {
         throw new Error(data.error?.message || '生成页面失败');
       }
 
-      setResult(data.data.page, data.data.projectId, data.data.shareUrl);
+      setResult(data.data.page, '', '');
       setGenerationStep('result');
     } catch (err) {
       setError(err instanceof Error ? err.message : '生成失败，请重试');

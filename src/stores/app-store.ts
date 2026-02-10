@@ -96,7 +96,16 @@ export const useAppStore = create<AppState>()(
       
       setIdea: (idea) => 
         set((state) => ({ 
-          generationFlow: { ...state.generationFlow, idea } 
+          generationFlow: { 
+            ...state.generationFlow, 
+            idea,
+            questions: [],
+            answers: {},
+            result: null,
+            projectId: null,
+            shareUrl: null,
+            error: null,
+          } 
         })),
       
       setQuestions: (questions) => 
