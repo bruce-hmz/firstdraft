@@ -6,9 +6,8 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/stores/app-store';
 import { Copy, Check, RefreshCw, Download, Sparkles, Loader2, Save } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
-import { createBrowserClient } from '@supabase/ssr';
 
 export function ResultStep() {
   const {
@@ -19,50 +18,17 @@ export function ResultStep() {
 
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [currentShareUrl, setCurrentShareUrl] = useState<string | null>(shareUrl);
-  const [currentSlug, setCurrentSlug] = useState<string | null>(null);
+  const [currentShareUrl, setCurrentShareUrl] = useState(shareUrl);
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  // Check if saved page exists in database
-  useEffect(() => {
-    if (shareUrl) {
-      const slug = shareUrl.split('/share/')[1];
-      setCurrentSlug(slug);
-      verifyPageExists(slug);
-    }
-  }, [shareUrl]);
-
-  const verifyPageExists = async (slug: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('pages')
-        .select('id')
-        .eq('slug', slug)
-        .eq('status', 'active')
-        .single();
-
-      if (error || !data) {
-        console.log('Page not found in database, need to save again');
-        setCurrentShareUrl(null);
-        setCurrentSlug(null);
-      }
-    } catch (e) {
-      console.log('Verification failed:', e);
-      setCurrentShareUrl(null);
-      setCurrentSlug(null);
-    }
-  };
+  if (!result) return null;
 
   const handleSaveAndShare = async () => {
-    console.log('Starting save and share process...');
-    if (saving || !result) return;
+    console.log('Initiating save and share process...');
+    if (saving) return;
 
     try {
       setSaving(true);
+      console.log('Starting save process...');
 
       const response = await fetch('/api/share', {
         method: 'POST',
@@ -82,31 +48,23 @@ export function ResultStep() {
       console.log('API response status:', response.status);
 
       const data = await response.json();
-      console.log('API response:', JSON.stringify(data, null, 2));
+      console.log('API response data:', JSON.stringify(data, null, 2));
 
       if (data.success && data.data) {
         const newShareUrl = data.data.shareUrl;
-        const newSlug = data.data.slug;
-        console.log('✅ Save successful! Slug:', newSlug);
+        console.log('✓ Share URL generated:', newShareUrl);
         setCurrentShareUrl(newShareUrl);
-        setCurrentSlug(newSlug);
-        setResult(result, newSlug, newShareUrl);
+        setResult(result, data.data.slug, newShareUrl);
 
-        // 自动复制（如果失败则显示提示）
-        try {
-          await navigator.clipboard.writeText(newShareUrl);
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        } catch (clipboardError) {
-          console.log('Clipboard copy failed, user can copy manually');
-          // 不提示错误，让用户手动点击复制按钮
-        }
+        await navigator.clipboard.writeText(newShareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
       } else {
-        console.error('❌ Save failed:', data.error);
-        alert('保存失败: ' + (data.error?.message || '未知错误'));
+        console.error('✗ Failed to save page:', data.error);
+        alert('保存失败: ' + (data.error?.message || '请检查控制台日志'));
       }
     } catch (error) {
-      console.error('❌ Exception:', error);
+      console.error('✗ Exception during save:', error);
       alert('保存失败: ' + error);
     } finally {
       setSaving(false);
@@ -114,18 +72,12 @@ export function ResultStep() {
   };
 
   const handleCopy = async () => {
-    if (!currentShareUrl) return;
-    
-    try {
+    if (currentShareUrl) {
       await navigator.clipboard.writeText(currentShareUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (e) {
-      alert('复制失败，请手动复制链接: ' + currentShareUrl);
     }
   };
-
-  if (!result) return null;
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">
@@ -144,13 +96,24 @@ export function ResultStep() {
             重新开始
           </Button>
           <Button
-            onClick={handleSaveAndShare}
+            onClick={currentShareUrl ? handleCopy : handleSaveAndShare}
+            variant={copied ? 'secondary' : 'default'}
             disabled={saving}
           >
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 保存中...
+              </>
+            ) : copied ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                已复制
+              </>
+            ) : currentShareUrl ? (
+              <>
+                <Copy className="mr-2 h-4 w-4" />
+                复制链接
               </>
             ) : (
               <>
@@ -239,7 +202,7 @@ export function ResultStep() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="flex justify-center gap-4"
+          className="flex justify-center"
         >
           <Link href={currentShareUrl} target="_blank">
             <Button variant="outline" className="gap-2">
@@ -247,19 +210,6 @@ export function ResultStep() {
               预览分享页面
             </Button>
           </Link>
-          <Button variant="outline" onClick={handleCopy}>
-            {copied ? (
-              <>
-                <Check className="mr-2 h-4 w-4" />
-                已复制
-              </>
-            ) : (
-              <>
-                <Copy className="mr-2 h-4 w-4" />
-                复制链接
-              </>
-            )}
-          </Button>
         </motion.div>
       )}
 
