@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/stores/app-store';
+import { useBilling } from '@/hooks/useBilling';
+import { Paywall } from '@/components/billing/Paywall';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -19,6 +21,8 @@ export function QuestionsStep() {
     setError,
   } = useAppStore();
 
+  const { checkPaywall, deductCredit } = useBilling();
+  const [showPaywall, setShowPaywall] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizeStatus, setOptimizeStatus] = useState<'idle' | 'loading' | 'success' | 'timeout'>('idle');
@@ -101,6 +105,12 @@ export function QuestionsStep() {
   };
 
   const handleSubmit = async () => {
+    const check = checkPaywall();
+    if (check.blocked) {
+      setShowPaywall(true);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setGenerationStep('generating');
@@ -123,6 +133,8 @@ export function QuestionsStep() {
         throw new Error(data.error?.message || '生成页面失败');
       }
 
+      await deductCredit();
+
       setResult(data.data.page, '', '');
       setGenerationStep('result');
     } catch (err) {
@@ -134,6 +146,10 @@ export function QuestionsStep() {
   };
 
   const progress = ((currentIndex + 1) / questions.length) * 100;
+
+  if (showPaywall) {
+    return <Paywall onClose={() => setShowPaywall(false)} />;
+  }
 
   if (!currentQuestion) return null;
 

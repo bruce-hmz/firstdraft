@@ -2,10 +2,18 @@ import { createClient } from '@/lib/supabase/server'
 import { NextResponse, NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+
+  // Skip public API routes
+  const publicApiRoutes = ['/api/billing/plans', '/api/generate/questions']
+  if (publicApiRoutes.some(route => pathname.startsWith(route))) {
+    return NextResponse.next({
+      request: { headers: request.headers },
+    })
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
-  const { pathname } = request.nextUrl
 
   const protectedRoutes = ['/drafts']
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
@@ -24,9 +32,7 @@ export async function middleware(request: NextRequest) {
   }
 
   return NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
+    request: { headers: request.headers },
   })
 }
 
