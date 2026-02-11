@@ -116,6 +116,14 @@ export function QuestionsStep() {
     setGenerationStep('generating');
 
     try {
+      const deductSuccess = await deductCredit();
+      if (!deductSuccess) {
+        setShowPaywall(true);
+        setLoading(false);
+        setGenerationStep('questions');
+        return;
+      }
+
       const response = await fetch('/api/generate/page', {
         method: 'POST',
         headers: {
@@ -132,8 +140,6 @@ export function QuestionsStep() {
       if (!data.success) {
         throw new Error(data.error?.message || '生成页面失败');
       }
-
-      await deductCredit();
 
       setResult(data.data.page, '', '');
       setGenerationStep('result');

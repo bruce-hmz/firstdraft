@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/stores/app-store';
-import { useBilling } from '@/hooks/useBilling';
-import { Paywall } from '@/components/billing/Paywall';
 import { Copy, Check, RefreshCw, Download, Sparkles, Loader2, Save } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
@@ -18,8 +16,6 @@ export function ResultStep() {
     resetFlow,
   } = useAppStore();
 
-  const { checkPaywall, deductCredit } = useBilling();
-  const [showPaywall, setShowPaywall] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
   const [currentShareUrl, setCurrentShareUrl] = useState(projectId ? shareUrl : '');
@@ -29,12 +25,6 @@ export function ResultStep() {
   const handleSaveAndShare = async () => {
     console.log('Initiating save and share process...');
     if (saving) return;
-
-    const check = checkPaywall();
-    if (check.blocked) {
-      setShowPaywall(true);
-      return;
-    }
 
     try {
       setSaving(true);
@@ -67,8 +57,6 @@ export function ResultStep() {
         setCurrentShareUrl(newShareUrl);
         setResult(result, data.data.slug, newShareUrl);
 
-        await deductCredit();
-
         await navigator.clipboard.writeText(newShareUrl);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -93,10 +81,6 @@ export function ResultStep() {
       setTimeout(() => setCopied(false), 2000);
     }
   };
-
-  if (showPaywall) {
-    return <Paywall onClose={() => setShowPaywall(false)} />;
-  }
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-8">

@@ -80,15 +80,20 @@ export function useBilling() {
   }, [billing]);
 
   const deductCredit = useCallback(async () => {
-    if (!billing.isLoggedIn) return false;
+    if (!billing.isLoggedIn) {
+      console.log('deductCredit: not logged in');
+      return false;
+    }
 
     try {
+      console.log('deductCredit: calling API');
       const res = await fetch('/api/billing/deduct', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
 
       const data = await res.json();
+      console.log('deductCredit: API response:', data);
 
       if (data.success) {
         setBilling(prev => ({
@@ -100,6 +105,7 @@ export function useBilling() {
         return true;
       }
 
+      console.error('deductCredit: API returned error:', data.error);
       return false;
     } catch (error) {
       console.error('Failed to deduct credit:', error);

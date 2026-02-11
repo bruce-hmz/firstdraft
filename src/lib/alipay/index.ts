@@ -1,4 +1,4 @@
-import AlipaySdk from 'alipay-sdk';
+import { AlipaySdk } from 'alipay-sdk';
 
 // 初始化支付宝 SDK
 export const alipaySdk = new AlipaySdk({

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
+const NEW_USER_FREE_CREDITS = 3;
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -23,7 +25,7 @@ export async function GET(req: NextRequest) {
       .eq('user_id', user.id)
       .single();
 
-    const remainingCredits = stats?.remaining_credits || 0;
+    const remainingCredits = stats?.remaining_credits ?? NEW_USER_FREE_CREDITS;
     const generationCount = stats?.generation_count || 0;
     const saveCount = stats?.save_count || 0;
     const canGenerate = remainingCredits > 0;

@@ -14,15 +14,18 @@ export async function POST(req: NextRequest) {
     }
 
     // 调用数据库函数扣减次数
+    console.log('Calling deduct_credits for user:', user.id);
     const { data: success, error } = await supabase.rpc('deduct_credits', {
       user_id: user.id,
       amount: 1,
     });
 
+    console.log('deduct_credits result:', { success, error });
+
     if (error) {
       console.error('Deduct credits error:', error);
       return NextResponse.json(
-        { success: false, error: 'Failed to deduct credits' },
+        { success: false, error: 'Failed to deduct credits: ' + error.message },
         { status: 500 }
       );
     }
