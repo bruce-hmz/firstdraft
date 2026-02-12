@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from '@/lib/next-intl';
 import { useAppStore } from '@/stores/app-store';
 import { QuestionsStep } from '@/components/steps/questions-step';
 import { GeneratingStep } from '@/components/steps/generating-step';
@@ -11,6 +12,7 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function GeneratePage() {
   const router = useRouter();
+  const t = useTranslations();
   const {
     generationFlow: { step, idea, error },
     setGenerationStep,
@@ -42,7 +44,7 @@ export default function GeneratePage() {
             className="mb-8 text-neutral-600"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            返回
+            {t('common.back')}
           </Button>
         )}
 
@@ -55,10 +57,10 @@ export default function GeneratePage() {
         {step === 'questions' && (
           <div>
             <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-              让我们深入了解你的想法
+              {t('generate.pageTitle')}
             </h1>
             <p className="text-neutral-600 mb-8">
-              回答3个简单问题，帮助 AI 生成更精准的产品页面
+              {t('generate.pageDescription')}
             </p>
             <QuestionsStep />
           </div>

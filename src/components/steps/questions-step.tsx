@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from '@/lib/next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@/stores/app-store';
 import { useBilling } from '@/hooks/useBilling';
@@ -10,7 +11,66 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowRight, ArrowLeft, Loader2, SkipForward, Sparkles, Check } from 'lucide-react';
 
+interface Question {
+  id: string;
+  question: string;
+  placeholder: string;
+  example: string;
+}
+
+interface QuestionTemplate {
+  keywords: string[];
+  key: string;
+}
+
+const QUESTION_TEMPLATES: QuestionTemplate[] = [
+  { keywords: ['开发者', '代码', '编程', '开发', '程序员', '工程师', '技术', 'API', 'snippet', 'git', 'developer', 'code', 'programming', 'dev', 'engineer', 'tech'], key: 'dev-tool' },
+  { keywords: ['宝宝', '婴儿', '育儿', '孩子', '成长记录', '宝妈', '奶爸', '亲子', 'baby', 'parent', 'child', 'parenting', 'growth'], key: 'parenting' },
+  { keywords: ['睡眠', '失眠', '助眠', '健康', 'sleep', 'insomnia', 'health', 'tracker'], key: 'health' },
+];
+
+function getQuestionsForIdea(t: (key: string) => string, idea: string): Question[] {
+  const ideaLower = idea.toLowerCase();
+  
+  const matches = QUESTION_TEMPLATES.map(template => {
+    const matchCount = template.keywords.filter(kw => 
+      ideaLower.includes(kw.toLowerCase())
+    ).length;
+    return { key: template.key, matchCount };
+  }).filter(m => m.matchCount > 0)
+    .sort((a, b) => b.matchCount - a.matchCount);
+  
+  const templateKey = matches.length > 0 ? matches[0].key : 'default';
+  
+  const questions: Question[] = [];
+  for (let i = 0; i < 3; i++) {
+    const questionText = t(`questions.${templateKey}.${i}.question`);
+    if (questionText && questionText !== `questions.${templateKey}.${i}.question`) {
+      questions.push({
+        id: t(`questions.${templateKey}.${i}.id`),
+        question: questionText,
+        placeholder: t(`questions.${templateKey}.${i}.placeholder`),
+        example: t(`questions.${templateKey}.${i}.example`),
+      });
+    }
+  }
+  
+  if (questions.length === 0) {
+    for (let i = 0; i < 3; i++) {
+      questions.push({
+        id: t(`questions.default.${i}.id`),
+        question: t(`questions.default.${i}.question`),
+        placeholder: t(`questions.default.${i}.placeholder`),
+        example: t(`questions.default.${i}.example`),
+      });
+    }
+  }
+  
+  return questions;
+}
+
 export function QuestionsStep() {
+  const t = useTranslations();
   const {
     generationFlow: { questions, answers, isLoading, idea },
     setAnswer,
@@ -26,27 +86,15 @@ export function QuestionsStep() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizeStatus, setOptimizeStatus] = useState<'idle' | 'loading' | 'success' | 'timeout'>('idle');
+  
   const currentQuestion = questions[currentIndex];
 
-  // 如果 questions 为空，根据 idea 获取预设问题
   useEffect(() => {
     if (questions.length === 0 && idea) {
-      fetch('/api/generate/questions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idea }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.success && data.data?.questions) {
-            setQuestions(data.data.questions);
-          }
-        })
-        .catch((err) => {
-          console.error('获取问题失败:', err);
-        });
+      const newQuestions = getQuestionsForIdea(t, idea);
+      setQuestions(newQuestions);
     }
-  }, [questions, idea, setQuestions]);
+  }, [questions.length, idea, t, setQuestions]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -73,7 +121,7 @@ export function QuestionsStep() {
         setOptimizeStatus('timeout');
       }
     } catch (error) {
-      console.error('优化失败:', error);
+      console.error('Optimization failed:', error);
       setOptimizeStatus('timeout');
     } finally {
       setIsOptimizing(false);
@@ -138,20 +186,20 @@ export function QuestionsStep() {
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error?.message || '生成页面失败');
+        throw new Error(data.error?.message || t('errors.generateError'));
       }
 
       setResult(data.data.page, '', '');
       setGenerationStep('result');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '生成失败，请重试');
+      setError(err instanceof Error ? err.message : t('errors.genericError'));
       setGenerationStep('questions');
     } finally {
       setLoading(false);
     }
   };
 
-  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
 
   if (showPaywall) {
     return <Paywall onClose={() => setShowPaywall(false)} />;
@@ -165,28 +213,28 @@ export function QuestionsStep() {
         return (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            AI优化中...
+            {t('generate.aiOptimizing')}
           </>
         );
       case 'success':
         return (
           <>
             <Check className="mr-2 h-4 w-4" />
-            已优化
+            {t('generate.optimized')}
           </>
         );
       case 'timeout':
         return (
           <>
             <Sparkles className="mr-2 h-4 w-4" />
-            当前问题已够用
+            {t('generate.currentSufficient')}
           </>
         );
       default:
         return (
           <>
             <Sparkles className="mr-2 h-4 w-4" />
-            让AI优化这些问题
+            {t('generate.aiOptimize')}
           </>
         );
     }
@@ -205,7 +253,7 @@ export function QuestionsStep() {
         </div>
         <div className="flex justify-between items-center mt-2">
           <p className="text-sm text-neutral-500">
-            {currentIndex + 1} / {questions.length}
+            {t('generate.progressLabel', { current: currentIndex + 1, total: questions.length })}
           </p>
           <Button
             variant="ghost"
@@ -239,9 +287,9 @@ export function QuestionsStep() {
               className="h-14 text-lg border-2 border-neutral-200 focus:border-neutral-400 rounded-xl"
             />
             <div className="mt-4">
-              <p className="text-sm text-neutral-500 mb-2">点击选择示例答案：</p>
+              <p className="text-sm text-neutral-500 mb-2">{t('generate.selectExample')}</p>
               <div className="flex flex-wrap gap-2">
-                {currentQuestion.example.split('、').map((example, idx) => (
+                {currentQuestion.example.split(/[,，、]/).map((example, idx) => (
                   <button
                     key={idx}
                     onClick={() => setAnswer(currentQuestion.id, example.trim())}
@@ -263,7 +311,7 @@ export function QuestionsStep() {
           className="text-neutral-600"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          返回
+          {t('common.back')}
         </Button>
 
         <div className="flex gap-3">
@@ -273,7 +321,7 @@ export function QuestionsStep() {
             className="text-neutral-500"
           >
             <SkipForward className="mr-2 h-4 w-4" />
-            跳过
+            {t('generate.buttonSkip')}
           </Button>
 
           <Button
@@ -284,16 +332,16 @@ export function QuestionsStep() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                生成中...
+                {t('generate.generating')}
               </>
             ) : currentIndex === questions.length - 1 ? (
               <>
-                生成页面
+                {t('generate.buttonGenerate')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </>
             ) : (
               <>
-                下一个
+                {t('generate.buttonNext')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </>
             )}

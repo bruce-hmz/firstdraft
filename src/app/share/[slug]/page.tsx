@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from '@/lib/next-intl';
 import { createBrowserClient } from '@supabase/ssr';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -25,6 +26,7 @@ interface PageData {
 }
 
 export default function SharePage({ params }: SharePageProps) {
+  const t = useTranslations();
   const [slug, setSlug] = useState<string>('');
   const [pageData, setPageData] = useState<PageData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -100,9 +102,9 @@ export default function SharePage({ params }: SharePageProps) {
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <h1 className="text-4xl font-bold text-neutral-900 mb-4">404</h1>
-          <p className="text-neutral-600 mb-6">页面不存在或已被删除</p>
+          <p className="text-neutral-600 mb-6">{t('errors.genericError')}</p>
           <Link href="/">
-            <Button>返回首页</Button>
+            <Button>{t('nav.myDrafts')}</Button>
           </Link>
         </div>
       </div>
@@ -113,9 +115,9 @@ export default function SharePage({ params }: SharePageProps) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-neutral-900 mb-4">出错了</h1>
-          <p className="text-neutral-600 mb-6">请刷新页面重试</p>
-          <Button onClick={() => window.location.reload()}>刷新</Button>
+          <h1 className="text-2xl font-bold text-neutral-900 mb-4">{t('errors.error')}</h1>
+          <p className="text-neutral-600 mb-6">{t('errors.tryAgain')}</p>
+          <Button onClick={() => window.location.reload()}>{t('common.refresh')}</Button>
         </div>
       </div>
     );
@@ -136,17 +138,17 @@ export default function SharePage({ params }: SharePageProps) {
               {copied ? (
                 <>
                   <Check className="h-4 w-4 mr-1" />
-                  已复制
+                  {t('common.copied')}
                 </>
               ) : (
                 <>
                   <Copy className="h-4 w-4 mr-1" />
-                  复制链接
+                  {t('result.copyLink')}
                 </>
               )}
             </Button>
             <Link href="/">
-              <Button size="sm">创建我的</Button>
+              <Button size="sm">{t('drafts.title')}</Button>
             </Link>
           </div>
         </div>
@@ -156,7 +158,7 @@ export default function SharePage({ params }: SharePageProps) {
         <Card className="overflow-hidden border-0 shadow-none">
           <div className="bg-neutral-900 text-white p-12 text-center">
             <Badge variant="secondary" className="mb-4 bg-white/10 text-white border-0">
-              新产品
+              {t('result.newProduct')}
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">{content.productName}</h1>
             <p className="text-xl text-neutral-300 mb-2">{content.tagline}</p>
@@ -213,7 +215,7 @@ export default function SharePage({ params }: SharePageProps) {
 
           <div className="bg-neutral-50 p-4 text-center border-t border-neutral-100">
             <p className="text-sm text-neutral-400">
-              由 FirstDraft 生成
+              {t('result.generatedBy')}
             </p>
           </div>
         </Card>

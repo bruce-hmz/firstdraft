@@ -1,0 +1,361 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "loading": "Loading...",
+    "processing": "Processing...",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "close": "Close",
+    "view": "View",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "refresh": "Refresh",
+    "edit": "Edit",
+    "search": "Search",
+    "submit": "Submit",
+    "retry": "Retry",
+    "error": "Error",
+    "success": "Success",
+    "or": "or",
+    "times": "times",
+    "per_time": "/time"
+  },
+  "nav": {
+    "admin": "Admin",
+    "login": "Login",
+    "logout": "Logout",
+    "myDrafts": "My Drafts"
+  },
+  "home": {
+    "title": "That idea keeping you up at night",
+    "titleLine2": "Finally ready to see the light",
+    "description": "Don't let great ideas rot in your head.",
+    "descriptionLine2": "3 minutes. Give it a proper home.",
+    "cta": "Start Generating",
+    "ideaInputTitle": "What's your idea?",
+    "ideaInputDescription": "Describe your product idea in a few sentences, and AI will turn it into a complete product page",
+    "ideaPlaceholder": "e.g., A tool that helps developers quickly find code snippets...",
+    "exampleTitle": "Not sure where to start?",
+    "exampleDescription": "Choose an example idea, or type your own creative idea directly",
+    "exampleAll": "All",
+    "exampleHint": "💡 Click any example idea to get started, or type your own creative idea above",
+    "exampleIdeas": {
+      "dev-tool": {
+        "title": "Code Snippet Manager",
+        "description": "A tool that helps developers quickly find, save, and share code snippets",
+        "category": "Dev Tools",
+        "tags": ["Developers", "Productivity", "Code Management"]
+      },
+      "parenting-app": {
+        "title": "Baby Growth Tracker",
+        "description": "A mobile app that helps new parents record baby milestones, vaccinations, and daily care",
+        "category": "Parenting",
+        "tags": ["Parenting", "Growth Records", "New Parents"]
+      },
+      "sleep-tracker": {
+        "title": "Smart Sleep Tracker",
+        "description": "A health app that analyzes sleep patterns through AI and provides personalized sleep improvement suggestions",
+        "category": "Health",
+        "tags": ["Health", "Sleep", "AI Analysis"]
+      },
+      "social-community": {
+        "title": "Interest-Based Social Platform",
+        "description": "Connect users with shared hobbies to create in-depth vertical communities",
+        "category": "Social",
+        "tags": ["Social", "Community", "Interests"]
+      },
+      "ecommerce-helper": {
+        "title": "E-commerce Price Comparison Assistant",
+        "description": "Help consumers find the best prices with authentic guarantees and smart recommendations",
+        "category": "Shopping",
+        "tags": ["E-commerce", "Price Compare", "Shopping Assistant"]
+      },
+      "content-creator": {
+        "title": "Content Creation Assistant",
+        "description": "AI-assisted full-process tool for content creators to select topics, write, and distribute",
+        "category": "Content Creation",
+        "tags": ["Creation", "AI", "Content Distribution"]
+      }
+    },
+    "feature1Title": "Strike while the iron is hot",
+    "feature1Description": "Good ideas don't wait. Give it a dignified start now",
+    "feature2Title": "It understands what you want to say",
+    "feature2Description": "No need to rack your brain for words. AI helps you express yourself beautifully",
+    "feature3Title": "Show the world your ambition",
+    "feature3Description": "One link is enough. Send it to friends, investors, or the family who always supports you",
+    "footer": "© 2024 FirstDraft. Turn your first idea into something real."
+  },
+  "generate": {
+    "pageTitle": "Let's dive deeper into your idea",
+    "pageDescription": "Answer 3 simple questions to help AI create a more precise product page",
+    "progressLabel": "{current} / {total}",
+    "aiOptimize": "Let AI optimize these questions",
+    "aiOptimizing": "AI optimizing...",
+    "optimized": "Optimized",
+    "currentSufficient": "Current questions are sufficient",
+    "selectExample": "Click to select an example answer:",
+    "buttonNext": "Next",
+    "buttonGenerate": "Generate Page",
+    "buttonSkip": "Skip",
+    "buttonBack": "Back",
+    "generating": "Generating...",
+    "generatingTitle": "AI is building your product page",
+    "step1": "Analyzing your product idea...",
+    "step2": "Extracting core value proposition...",
+    "step3": "Writing product copy...",
+    "step4": "Designing page structure...",
+    "estimatedTime": "Estimated 10-20 seconds"
+  },
+  "result": {
+    "title": "Your product page has been generated",
+    "description": "Preview the result and share with others",
+    "restart": "Start Over",
+    "copyLink": "Copy Link",
+    "saveAndShare": "Save and Share",
+    "saving": "Saving...",
+    "previewShare": "Preview Shared Page",
+    "saveProject": "Save Project",
+    "regenerate": "Regenerate",
+    "proBadge": "Pro",
+    "newProduct": "New Product",
+    "generatedBy": "Generated by FirstDraft"
+  },
+  "drafts": {
+    "title": "Create New Page",
+    "published": "Published",
+    "draft": "Draft",
+    "noDescription": "No description",
+    "views": "views",
+    "empty": "No drafts yet",
+    "emptyDescription": "You haven't created any drafts yet. Click the button above to start creating."
+  },
+  "auth": {
+    "signInTitle": "Sign In",
+    "signUpTitle": "Create Account",
+    "signInDescription": "Sign in to manage your page drafts",
+    "signUpDescription": "Create an account to save and manage your pages",
+    "email": "Email",
+    "emailPlaceholder": "your@email.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Sign In",
+    "signUp": "Create Account",
+    "signInButton": "Sign In",
+    "signUpButton": "Create Account",
+    "noAccount": "Don't have an account? Click to sign up",
+    "hasAccount": "Already have an account? Click to sign in",
+    "processing": "Processing...",
+    "confirmEmail": "Confirmation email sent to {email}. Please check your inbox and click the confirmation link. If you don't receive it, please check your spam folder."
+  },
+  "billing": {
+    "title": "Purchase Generation Credits",
+    "description": "Choose the right plan and start creating your product pages",
+    "loading": "Loading plans...",
+    "loadFailed": "Load Failed",
+    "loadFailedDescription": "Unable to load plan information. Please check if the database migration has been executed.",
+    "selectPlan": "Select Plan",
+    "selectPayment": "Select Payment Method",
+    "alipay": "Alipay",
+    "creditCard": "Credit/Debit Card",
+    "alipayPay": "Alipay",
+    "cardPay": "Card Payment",
+    "later": "Maybe Later",
+    "terms": "By paying, you agree to our Terms of Service. Credits are permanently valid and can be used at any time.",
+    "recommended": "Recommended",
+    "paymentError": "Failed to create payment session, please try again",
+    "paymentUnavailable": "Payment system temporarily unavailable",
+    "getCredits": "Get Credits",
+    "success": {
+      "verifying": "Verifying your payment...",
+      "plan": "Plan",
+      "purchaseSuccess": "Purchase Successful!",
+      "welcomePro": "Welcome to FirstDraft Pro!",
+      "successMessagePro": "Your payment has been processed successfully. You can now enjoy unlimited generation and saving.",
+      "successMessageCredits": "Your payment has been processed successfully. You have purchased {credits} generation credits.",
+      "proBenefits": "Pro Benefits",
+      "planBenefits": "{planName} Benefits",
+      "unlimitedGenerations": "Unlimited product page generations",
+      "creditsGenerations": "{credits} product page generations",
+      "unlimitedSaves": "Unlimited saves and shares",
+      "onDemandSaves": "On-demand saves and shares",
+      "prioritySpeed": "Priority generation speed",
+      "exportHTML": "Export HTML source code",
+      "orderNumber": "Order Number",
+      "paymentAmount": "Payment Amount",
+      "remainingCredits": "Remaining {credits} generation credits",
+      "verificationError": "Verification failed, but payment may have been processed successfully",
+      "creditsAdded": "✓ Credits have been successfully added to your account",
+      "startCreating": "Start Creating",
+      "refreshRetry": "Refresh to retry"
+    },
+    "plans": {
+      "0": {
+        "name": "Starter",
+        "description": "Perfect for trying out"
+      },
+      "1": {
+        "name": "Popular",
+        "description": "Best value for creators"
+      },
+      "2": {
+        "name": "Pro",
+        "description": "For power users and teams"
+      }
+    }
+  },
+  "paywall": {
+    "noCredits": "Insufficient Credits",
+    "description": "Your credits have been exhausted. Purchase more to continue",
+    "getCredits": "Get Credits"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "accessDenied": "Access Denied",
+    "accessDeniedDescription": "You don't have permission to access this page",
+    "backToHome": "Back to Home",
+    "checking": "Checking permissions...",
+    "modelsTab": "Model Config",
+    "creditsTab": "User Credits",
+    "modelsTitle": "AI Model Configuration",
+    "modelManagement": "Model Management",
+    "addModel": "Add Model",
+    "editModel": "Edit Model",
+    "provider": "Provider",
+    "selectModel": "Select Model",
+    "apiKey": "API Key",
+    "apiPlaceholder": "sk-...",
+    "apiHint": "Just fill in the API Key, other configs are preset",
+    "modelName": "Model Name",
+    "modelPlaceholder": "e.g., OpenAI GPT-4",
+    "baseUrl": "Base URL",
+    "urlPlaceholder": "https://api.custom.com/v1",
+    "modelId": "Model ID",
+    "idPlaceholder": "gpt-4o-mini",
+    "description": "Description",
+    "descPlaceholder": "Briefly describe the purpose of this model",
+    "enable": "Enable",
+    "setDefault": "Set as Default",
+    "presetConfig": "Preset Configuration",
+    "name": "Name",
+    "saveChanges": "Save Changes",
+    "confirmDelete": "Are you sure you want to delete this model?",
+    "loading": "Loading...",
+    "noModels": "No model configuration yet. Click 'Add Model' in the top right to start",
+    "default": "Default",
+    "disabled": "Disabled",
+    "selectPreset": "Select {provider} Model",
+    "presetHint": "Select a preset model to auto-fill the configuration",
+    "creditsTitle": "User Credit Management",
+    "findUser": "Find User",
+    "userEmail": "User Email",
+    "emailPlaceholder": "user@example.com",
+    "remainingCredits": "Remaining Credits",
+    "generationCount": "Generation Count",
+    "saveCount": "Save Count",
+    "topUp": "Top Up Credits",
+    "topUpAmount": "Top Up Amount (times)",
+    "amountPlaceholder": "Enter top-up amount",
+    "amountHint": "Will add credits for {email}",
+    "searchUser": "Please search for a user first",
+    "searchFailed": "Search failed",
+    "invalidAmount": "Please enter a valid top-up amount",
+    "chargeSuccess": "Top-up successful!",
+    "charging": "Processing...",
+    "confirmTopUp": "Confirm Top-up",
+    "search": "Search",
+    "recharge": "Recharge"
+  },
+  "errors": {
+    "authError": "Authentication failed",
+    "generateError": "Failed to generate page",
+    "saveError": "Save failed",
+    "genericError": "An error occurred",
+    "tryAgain": "Please try again"
+  },
+  "questions": {
+    "default": [
+      {
+        "id": "target_user",
+        "question": "Who is this product mainly for?",
+        "placeholder": "Describe your target user group, the more specific the better...",
+        "example": "Recent graduates entering the workforce, people with specific needs in a vertical market, ordinary people trying to solve a certain problem"
+      },
+      {
+        "id": "core_problem",
+        "question": "What specific problem or pain point are they currently facing?",
+        "placeholder": "Describe the difficult scenarios users currently encounter...",
+        "example": "Existing solutions are too complex or expensive, lacking this tool makes work inefficient, manual operations are prone to errors"
+      },
+      {
+        "id": "unique_value",
+        "question": "How does your product uniquely solve this problem?",
+        "placeholder": "Explain your solution and differentiated value...",
+        "example": "AI automates the processing, simpler and cheaper than competitors, deeply optimized for specific scenarios"
+      }
+    ],
+    "dev-tool": [
+      {
+        "id": "target_user",
+        "question": "What kind of developers does your tool mainly serve?",
+        "placeholder": "Describe the type of developers and work scenarios...",
+        "example": "Frontend engineers who frequently reuse code, programming beginners, tech leads managing multiple projects"
+      },
+      {
+        "id": "pain_point",
+        "question": "What troubles do they most often encounter when writing or managing code?",
+        "placeholder": "Describe specific pain points in the development workflow...",
+        "example": "Can't find previously written code snippets, reinventing the wheel within the team, copying and pasting code between projects is error-prone"
+      },
+      {
+        "id": "unique_value",
+        "question": "How does your product make code management and reuse more efficient?",
+        "placeholder": "Explain core functionality and developer experience advantages...",
+        "example": "One-click save and search code snippets, support for multiple languages and IDE integrations, team-shared code library to avoid duplicate development"
+      }
+    ],
+    "parenting": [
+      {
+        "id": "target_user",
+        "question": "What kind of parents does your app mainly help?",
+        "placeholder": "Describe the characteristics of the target parent group...",
+        "example": "New moms with 0-3 year olds, working mothers with a second child, families where grandparents help with childcare"
+      },
+      {
+        "id": "pain_point",
+        "question": "What difficulties do these parents encounter when recording their baby's growth?",
+        "placeholder": "Describe specific pain points in parenting records...",
+        "example": "Photos scattered across various albums are hard to organize, can't remember vaccination schedules, miss milestones like baby's first rollover"
+      },
+      {
+        "id": "unique_value",
+        "question": "How does your product make parenting records easy and meaningful?",
+        "placeholder": "Explain core functionality and emotional value...",
+        "example": "Automatically generate growth timelines, smart reminders for vaccines and checkups, one-click generation of growth albums to share with family"
+      }
+    ],
+    "health": [
+      {
+        "id": "target_user",
+        "question": "What kind of users does your sleep app mainly help?",
+        "placeholder": "Describe the target user's sleep issues...",
+        "example": "Office workers who want to understand sleep quality, people with sleep disorders who need monitoring, health enthusiasts who want to improve routines through data"
+      },
+      {
+        "id": "pain_point",
+        "question": "What difficulties do they encounter when trying to understand or improve their sleep?",
+        "placeholder": "Describe specific problems with sleep monitoring or improvement...",
+        "example": "Don't know their sleep quality, manual sleep recording is too troublesome, don't understand sleep data and don't know how to improve"
+      },
+      {
+        "id": "unique_value",
+        "question": "How does your product help them better understand and improve their sleep?",
+        "placeholder": "Explain monitoring methods and personalized suggestions...",
+        "example": "Automatic sleep cycle monitoring without manual recording, AI analysis of sleep data with improvement suggestions, smart reminders for optimal bedtime based on sleep patterns"
+      }
+    ]
+  }
+}

@@ -1,14 +1,16 @@
 'use client';
 
+import { useTranslations } from '@/lib/next-intl';
 import { motion } from 'framer-motion';
 import { Loader2, Sparkles } from 'lucide-react';
 
 export function GeneratingStep() {
+  const t = useTranslations();
   const steps = [
-    '分析你的产品想法...',
-    '提炼核心价值主张...',
-    '撰写产品文案...',
-    '设计页面结构...',
+    t('generate.step1'),
+    t('generate.step2'),
+    t('generate.step3'),
+    t('generate.step4'),
   ];
 
   return (
@@ -31,7 +33,7 @@ export function GeneratingStep() {
       </motion.div>
 
       <h3 className="text-xl font-medium text-neutral-900 mt-8 mb-4">
-        AI 正在构建你的产品页面
+        {t('generate.generatingTitle')}
       </h3>
 
       <div className="space-y-3 w-full max-w-xs">
@@ -61,7 +63,7 @@ export function GeneratingStep() {
       </div>
 
       <p className="text-sm text-neutral-400 mt-8">
-        预计需要 10-20 秒
+        {t('generate.estimatedTime')}
       </p>
     </div>
   );

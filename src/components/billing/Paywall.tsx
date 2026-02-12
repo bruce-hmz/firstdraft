@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslations } from '@/lib/next-intl';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -20,6 +21,7 @@ interface PaywallProps {
 }
 
 export function Paywall({ onClose }: PaywallProps) {
+  const t = useTranslations();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'alipay' | 'stripe'>('alipay');
@@ -36,7 +38,7 @@ export function Paywall({ onClose }: PaywallProps) {
       const res = await fetch('/api/billing/plans');
       const data = await res.json();
       console.log('Plans response:', data);
-      
+
       if (data.plans && Array.isArray(data.plans) && data.plans.length > 0) {
         setPlans(data.plans);
         setSelectedPlan(data.plans[1]?.id || data.plans[0]?.id);
@@ -61,8 +63,8 @@ export function Paywall({ onClose }: PaywallProps) {
 
     setLoading(true);
     try {
-      const endpoint = paymentMethod === 'alipay' 
-        ? '/api/billing/alipay/create' 
+      const endpoint = paymentMethod === 'alipay'
+        ? '/api/billing/alipay/create'
         : '/api/billing/checkout';
 
       const res = await fetch(endpoint, {
@@ -76,12 +78,12 @@ export function Paywall({ onClose }: PaywallProps) {
       if (data.url || data.payUrl) {
         window.location.href = data.url || data.payUrl;
       } else {
-        alert('创建支付会话失败，请重试');
+        alert(t('billing.paymentError'));
         setLoading(false);
       }
     } catch (error) {
       console.error('Payment error:', error);
-      alert('支付系统暂时不可用');
+      alert(t('billing.paymentUnavailable'));
       setLoading(false);
     }
   };
@@ -97,7 +99,7 @@ export function Paywall({ onClose }: PaywallProps) {
       >
         <div className="text-white flex items-center gap-2">
           <Loader2 className="h-6 w-6 animate-spin" />
-          加载套餐...
+          {t('billing.loading')}
         </div>
       </motion.div>
     );
@@ -111,12 +113,12 @@ export function Paywall({ onClose }: PaywallProps) {
         className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       >
         <Card className="p-8 max-w-md w-full text-center">
-          <h3 className="text-xl font-bold text-neutral-900 mb-4">加载失败</h3>
+          <h3 className="text-xl font-bold text-neutral-900 mb-4">{t('billing.loadFailed')}</h3>
           <p className="text-neutral-600 mb-4">
-            无法加载套餐信息。请检查数据库迁移是否已执行。
+            {t('billing.loadFailedDescription')}
           </p>
           <Button onClick={onClose} variant="outline" className="w-full">
-            关闭
+            {t('common.close')}
           </Button>
         </Card>
       </motion.div>
@@ -140,46 +142,43 @@ export function Paywall({ onClose }: PaywallProps) {
               <Zap className="h-8 w-8 text-white" />
             </div>
             <h3 className="text-2xl font-bold text-neutral-900 mb-2">
-              购买生成额度
+              {t('billing.title')}
             </h3>
             <p className="text-neutral-600">
-              选择合适的套餐，开始创建你的产品页面
+              {t('billing.description')}
             </p>
           </div>
 
-          {/* 套餐选择 */}
+          {/* Plan selection */}
           <div className="grid md:grid-cols-3 gap-4 mb-8">
             {plans.map((plan, index) => (
               <div
                 key={plan.id}
                 onClick={() => setSelectedPlan(plan.id)}
-                className={`
-                  relative p-6 rounded-xl border-2 cursor-pointer transition-all
-                  ${selectedPlan === plan.id 
-                    ? 'border-blue-500 bg-blue-50' 
-                    : 'border-neutral-200 hover:border-neutral-300'
-                  }
-                `}
+                className={selectedPlan === plan.id
+                  ? 'relative p-6 rounded-xl border-2 cursor-pointer transition-all border-blue-500 bg-blue-50'
+                  : 'relative p-6 rounded-xl border-2 cursor-pointer transition-all border-neutral-200 hover:border-neutral-300'
+                }
               >
                 {index === 1 && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                    推荐
+                    {t('billing.recommended')}
                   </div>
                 )}
-                
+
                 <div className="text-center">
-                  <h4 className="font-semibold text-neutral-900 mb-1">{plan.name}</h4>
-                  <p className="text-sm text-neutral-500 mb-4">{plan.description}</p>
-                  
+                  <h4 className="font-semibold text-neutral-900 mb-1">{t(`billing.plans.${index}.name`)}</h4>
+                  <p className="text-sm text-neutral-500 mb-4">{t(`billing.plans.${index}.description`)}</p>
+
                   <div className="mb-4">
-                    <span className="text-3xl font-bold text-neutral-900">¥{formatPrice(plan.price_cny)}</span>
+                    <span className="text-3xl font-bold text-neutral-900">{'¥' + formatPrice(plan.price_cny)}</span>
                   </div>
-                  
+
                   <div className="text-2xl font-bold text-blue-600 mb-1">
-                    {plan.credits} <span className="text-sm font-normal text-neutral-500">次</span>
+                    {plan.credits} <span className="text-sm font-normal text-neutral-500">{t('common.times')}</span>
                   </div>
                   <p className="text-xs text-neutral-400">
-                    约 ¥{(plan.price_cny / plan.credits / 100).toFixed(2)}/次
+                    {'¥' + ((plan.price_cny / plan.credits / 100).toFixed(2)) + t('common.per_time')}
                   </p>
 
                   {selectedPlan === plan.id && (
@@ -192,62 +191,56 @@ export function Paywall({ onClose }: PaywallProps) {
             ))}
           </div>
 
-          {/* 支付方式选择 */}
+          {/* Payment method selection */}
           <div className="mb-8">
-            <h4 className="text-sm font-semibold text-neutral-700 mb-4 text-center">选择支付方式</h4>
-            <div className="flex justify-center gap-4">
+            <h4 className="text-sm font-semibold text-neutral-700 mb-4 text-center">{t('billing.selectPayment')}</h4>
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
               <button
                 onClick={() => setPaymentMethod('alipay')}
-                className={`
-                  flex items-center gap-2 px-6 py-3 rounded-lg border-2 transition-all
-                  ${paymentMethod === 'alipay'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-neutral-200 hover:border-neutral-300'
-                  }
-                `}
+                className={paymentMethod === 'alipay'
+                  ? 'flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 transition-all border-blue-500 bg-blue-50'
+                  : 'flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 transition-all border-neutral-200 hover:border-neutral-300'
+                }
               >
                 <Wallet className="h-5 w-5 text-blue-500" />
-                <span className="font-medium">支付宝</span>
+                <span className="font-medium">{t('billing.alipay')}</span>
               </button>
 
               <button
                 onClick={() => setPaymentMethod('stripe')}
-                className={`
-                  flex items-center gap-2 px-6 py-3 rounded-lg border-2 transition-all
-                  ${paymentMethod === 'stripe'
-                    ? 'border-purple-500 bg-purple-50'
-                    : 'border-neutral-200 hover:border-neutral-300'
-                  }
-                `}
+                className={paymentMethod === 'stripe'
+                  ? 'flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 transition-all border-purple-500 bg-purple-50'
+                  : 'flex items-center justify-center gap-2 px-6 py-3 rounded-lg border-2 transition-all border-neutral-200 hover:border-neutral-300'
+                }
               >
                 <CreditCard className="h-5 w-5 text-purple-500" />
-                <span className="font-medium">信用卡/借记卡</span>
+                <span className="font-medium">{t('billing.creditCard')}</span>
                 {paymentMethod === 'stripe' && selectedPlanData && (
                   <span className="text-xs text-neutral-500">
-                    ${formatPrice(selectedPlanData.price_usd || selectedPlanData.price_cny)}
+                    {formatPrice(selectedPlanData.price_usd || selectedPlanData.price_cny)}
                   </span>
                 )}
               </button>
             </div>
           </div>
 
-          {/* 支付按钮 */}
+          {/* Payment button */}
           <div className="space-y-3">
             <Button
               onClick={handlePay}
               disabled={loading || !selectedPlan}
-              className="w-full h-12 text-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              className="w-full h-12 text-lg bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 sm:h-auto"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <>
-                  {paymentMethod === 'alipay' ? '支付宝支付' : '信用卡支付'}
+                  {paymentMethod === 'alipay' ? t('billing.alipayPay') : t('billing.cardPay')}
                   <span className="mx-2">·</span>
                   <span>
-                    {paymentMethod === 'alipay' 
-                      ? `¥${selectedPlanData ? formatPrice(selectedPlanData.price_cny) : '0.00'}`
-                      : `$${selectedPlanData ? formatPrice(selectedPlanData.price_usd || selectedPlanData.price_cny) : '0.00'}`
+                    {paymentMethod === 'alipay'
+                      ? '¥' + (selectedPlanData ? formatPrice(selectedPlanData.price_cny) : '0.00')
+                      : '$' + (selectedPlanData ? formatPrice(selectedPlanData.price_usd || selectedPlanData.price_cny) : '0.00')
                     }
                   </span>
                 </>
@@ -260,13 +253,13 @@ export function Paywall({ onClose }: PaywallProps) {
                 onClick={onClose}
                 className="w-full text-neutral-500"
               >
-                稍后再说
+                {t('billing.later')}
               </Button>
             )}
           </div>
 
           <p className="text-center text-xs text-neutral-400 mt-4">
-            支付即表示您同意我们的服务条款。额度永久有效，可随时使用。
+            {t('billing.terms')}
           </p>
         </Card>
       </motion.div>

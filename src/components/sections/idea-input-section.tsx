@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from '@/lib/next-intl'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,6 +14,7 @@ interface IdeaInputSectionProps {
 }
 
 export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
+  const t = useTranslations()
   const [idea, setIdeaState] = useState(initialIdea)
   const [isGenerating, setIsGenerating] = useState(false)
   const router = useRouter()
@@ -20,13 +22,13 @@ export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!idea.trim() || idea.trim().length < 5) {
       return
     }
 
     setIsGenerating(true)
-    
+
     try {
       setIdea(idea.trim())
       setGenerationStep('questions')
@@ -42,23 +44,23 @@ export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">
-          你的想法是什么？
+          {t('home.ideaInputTitle')}
         </CardTitle>
         <CardDescription>
-          用几句话描述你的产品想法，AI 会帮你把它变成一个完整的产品页面
+          {t('home.ideaInputDescription')}
         </CardDescription>
       </CardHeader>
-      
+
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <Textarea
-            placeholder="例如：一个帮助开发者快速找到代码片段的工具..."
+            placeholder={t('home.ideaPlaceholder')}
             value={idea}
             onChange={(e) => setIdeaState(e.target.value)}
             className="min-h-32 resize-none text-base"
             disabled={isGenerating}
           />
-          
+
           <div className="flex justify-center">
             <Button
               type="submit"
@@ -69,12 +71,12 @@ export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
               {isGenerating ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  处理中...
+                  {t('home.processing')}
                 </>
               ) : (
                 <>
                   <Sparkles className="h-4 w-4" />
-                  开始生成
+                  {t('home.cta')}
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Check, Loader2, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { useTranslations } from '@/lib/next-intl';
 
 interface OrderInfo {
   orderNo: string;
@@ -19,6 +20,7 @@ interface OrderInfo {
 function BillingSuccessContent() {
   const searchParams = useSearchParams();
   const orderNo = searchParams.get('order_no');
+  const t = useTranslations();
   
   const [loading, setLoading] = useState(true);
   const [orderInfo, setOrderInfo] = useState<OrderInfo | null>(null);
@@ -43,7 +45,7 @@ function BillingSuccessContent() {
 
         if (orderError) {
           console.error('Fetch order error:', orderError);
-          setError('无法获取订单信息');
+          setError(t('errors.genericError'));
           setLoading(false);
           return;
         }
@@ -52,7 +54,7 @@ function BillingSuccessContent() {
           const isPro = order.credits >= 1000;
           setOrderInfo({
             orderNo: order.order_no,
-            planName: isPro ? 'Pro' : '套餐',
+            planName: isPro ? 'Pro' : t('billing.success.plan'),
             credits: order.credits,
             amount: order.amount_cny / 100,
           });
@@ -76,7 +78,7 @@ function BillingSuccessContent() {
         }
       } catch (err) {
         console.error('Error:', err);
-        setError('获取订单信息失败');
+        setError(t('errors.genericError'));
       } finally {
         setLoading(false);
       }
@@ -90,7 +92,7 @@ function BillingSuccessContent() {
       <div className="min-h-screen flex items-center justify-center bg-neutral-50">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-neutral-400 mx-auto mb-4" />
-          <p className="text-neutral-600">正在确认您的支付...</p>
+          <p className="text-neutral-600">{t('billing.success.verifying')}</p>
         </div>
       </div>
     );
@@ -111,46 +113,46 @@ function BillingSuccessContent() {
           </div>
 
           <h1 className="text-2xl font-bold text-neutral-900 mb-2">
-            {isProPlan ? '欢迎加入 FirstDraft Pro!' : `购买 ${orderInfo?.planName || '套餐'} 成功!`}
+            {isProPlan ? t('billing.success.welcomePro') : t('billing.success.purchaseSuccess')}
           </h1>
 
           <p className="text-neutral-600 mb-6">
             {isProPlan 
-              ? '您的支付已成功处理。现在您可以享受无限次生成和保存功能。'
-              : `您的支付已成功处理。您已购买 ${orderInfo?.credits || 0} 次生成额度。`
+              ? t('billing.success.successMessagePro')
+              : t('billing.success.successMessageCredits', { credits: orderInfo?.credits || 0 })
             }
           </p>
 
           <div className="bg-neutral-50 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-neutral-900 mb-2">
-              {isProPlan ? 'Pro 权益' : `${orderInfo?.planName} 权益`}
+              {isProPlan ? t('billing.success.proBenefits') : t('billing.success.planBenefits', { planName: orderInfo?.planName })}
             </h3>
             <ul className="text-left text-sm text-neutral-600 space-y-2">
               <li className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-500" />
-                {isProPlan ? '无限次生成产品页面' : `${orderInfo?.credits || 0} 次生成产品页面`}
+                {isProPlan ? t('billing.success.unlimitedGenerations') : t('billing.success.creditsGenerations', { credits: orderInfo?.credits || 0 })}
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-500" />
-                {isProPlan ? '无限次保存和分享' : '按需保存和分享'}
+                {isProPlan ? t('billing.success.unlimitedSaves') : t('billing.success.onDemandSaves')}
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-500" />
-                优先生成速度
+                {t('billing.success.prioritySpeed')}
               </li>
               <li className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-500" />
-                导出 HTML 源代码
+                {t('billing.success.exportHTML')}
               </li>
             </ul>
             
             {orderInfo && (
               <div className="mt-4 pt-4 border-t border-neutral-200 text-sm text-neutral-500">
-                <p>订单号: {orderInfo.orderNo}</p>
-                <p>支付金额: ¥{orderInfo.amount.toFixed(2)}</p>
+                <p>{t('billing.success.orderNumber')}: {orderInfo.orderNo}</p>
+                <p>{t('billing.success.paymentAmount')}: ¥{orderInfo.amount.toFixed(2)}</p>
                 {orderInfo.credits > 0 && orderInfo.credits < 1000 && (
                   <p className="mt-1 text-amber-600 font-medium">
-                    剩余 {orderInfo.credits} 次生成额度
+                    {t('billing.success.remainingCredits', { credits: orderInfo.credits })}
                   </p>
                 )}
               </div>
@@ -159,19 +161,19 @@ function BillingSuccessContent() {
 
           {error && (
             <p className="text-sm text-amber-600 mb-4">
-              {error}，但支付可能已成功处理。
+              {error}. {t('billing.success.verificationError')}
             </p>
           )}
 
           {processed && (
             <p className="text-sm text-green-600 mb-4">
-              ✓ 额度已成功添加到您的账户
+              {t('billing.success.creditsAdded')}
             </p>
           )}
 
           <Link href="/">
             <Button className="w-full bg-neutral-900 hover:bg-neutral-800">
-              开始创建
+              {t('billing.success.startCreating')}
             </Button>
           </Link>
           
@@ -180,7 +182,7 @@ function BillingSuccessContent() {
               onClick={() => window.location.reload()}
               className="mt-3 text-sm text-neutral-500 hover:text-neutral-700 underline"
             >
-              刷新页面重试
+              {t('billing.success.refreshRetry')}
             </button>
           )}
         </Card>
@@ -189,16 +191,21 @@ function BillingSuccessContent() {
   );
 }
 
+function SuccessPageFallback() {
+  const t = useTranslations();
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50">
+      <div className="text-center">
+        <Loader2 className="h-12 w-12 animate-spin text-neutral-400 mx-auto mb-4" />
+        <p className="text-neutral-600">{t('billing.success.verifying')}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function BillingSuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-neutral-400 mx-auto mb-4" />
-          <p className="text-neutral-600">正在确认您的支付...</p>
-        </div>
-      </div>
-    }>
+    <Suspense fallback={<SuccessPageFallback />}>
       <BillingSuccessContent />
     </Suspense>
   );

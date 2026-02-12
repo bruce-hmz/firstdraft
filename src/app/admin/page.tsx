@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from '@/lib/next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -57,6 +58,7 @@ const PROVIDERS = [
 ]
 
 export default function AdminPage() {
+  const t = useTranslations() as (key: string, params?: Record<string, string | number>) => string
   const [activeTab, setActiveTab] = useState<TabType>('models')
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
   const [isCheckingAdmin, setIsCheckingAdmin] = useState(true)
@@ -77,7 +79,7 @@ export default function AdminPage() {
         setIsAdmin(false)
         return
       }
-      
+
       const adminEmail = '123387447@qq.com'
       setIsAdmin(data.data.email === adminEmail)
     } catch (error) {
@@ -91,7 +93,7 @@ export default function AdminPage() {
   if (isCheckingAdmin) {
     return (
       <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="text-neutral-500">检查权限...</div>
+        <div className="text-neutral-500">{t('admin.checking')}</div>
       </main>
     )
   }
@@ -100,10 +102,10 @@ export default function AdminPage() {
     return (
       <main className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <Card className="p-8 text-center">
-          <div className="text-red-500 text-xl mb-4">拒绝访问</div>
-          <p className="text-neutral-600 mb-4">您没有权限访问此页面</p>
+          <div className="text-red-500 text-xl mb-4">{t('admin.accessDenied')}</div>
+          <p className="text-neutral-600 mb-4">{t('admin.accessDeniedDescription')}</p>
           <a href="/" className="text-blue-500 hover:underline">
-            返回首页
+            {t('admin.backToHome')}
           </a>
         </Card>
       </main>
@@ -115,10 +117,10 @@ export default function AdminPage() {
       <nav className="w-full px-6 py-4 flex justify-between items-center border-b border-neutral-200 bg-white">
         <div className="flex items-center gap-2">
           <span className="text-xl font-bold text-neutral-900">FirstDraft</span>
-          <span className="text-sm text-neutral-500">管理后台</span>
+          <span className="text-sm text-neutral-500">{t('admin.title')}</span>
         </div>
         <a href="/" className="text-neutral-600 hover:text-neutral-900">
-          返回首页
+          {t('admin.backToHome')}
         </a>
       </nav>
 
@@ -134,7 +136,7 @@ export default function AdminPage() {
           >
             <div className="flex items-center gap-2">
               <Key className="h-4 w-4" />
-              模型配置
+              {t('admin.modelsTab')}
             </div>
           </button>
           <button
@@ -147,19 +149,23 @@ export default function AdminPage() {
           >
             <div className="flex items-center gap-2">
               <Coins className="h-4 w-4" />
-              用户充值
+              {t('admin.creditsTab')}
             </div>
           </button>
         </div>
 
-        {activeTab === 'models' && <ModelsTab />}
-        {activeTab === 'credits' && <CreditsTab />}
+        {activeTab === 'models' && <ModelsTab t={t} />}
+        {activeTab === 'credits' && <CreditsTab t={t} />}
       </div>
     </main>
   )
 }
 
-function ModelsTab() {
+interface TabProps {
+  t: (key: string) => string
+}
+
+function ModelsTab({ t }: TabProps) {
   const [models, setModels] = useState<AIModel[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isModelDialogOpen, setIsModelDialogOpen] = useState(false)
@@ -227,7 +233,7 @@ function ModelsTab() {
   }
 
   const handleDeleteModel = async (id: string) => {
-    if (!confirm('确定要删除这个模型吗？')) return
+    if (!confirm(t('admin.confirmDelete'))) return
 
     try {
       const response = await fetch(`/api/admin/models/${id}`, {
@@ -283,13 +289,13 @@ function ModelsTab() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-neutral-900 mb-8">AI 模型配置</h1>
+      <h1 className="text-3xl font-bold text-neutral-900 mb-8">{t('admin.modelsTitle')}</h1>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Key className="h-5 w-5" />
-            大模型管理
+            {t('admin.modelManagement')}
           </CardTitle>
           <Dialog open={isModelDialogOpen} onOpenChange={(open) => {
             setIsModelDialogOpen(open)
@@ -298,18 +304,18 @@ function ModelsTab() {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
-                添加模型
+                {t('admin.addModel')}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader>
                 <DialogTitle>
-                  {editingModel ? '编辑模型' : '添加模型'}
+                  {editingModel ? t('admin.editModel') : t('admin.addModel')}
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <div>
-                  <Label>提供商</Label>
+                  <Label>{t('admin.provider')}</Label>
                   <Select value={provider} onValueChange={(val) => {
                     setProvider(val)
                     setSelectedPreset('')
@@ -330,87 +336,91 @@ function ModelsTab() {
                     </SelectContent>
                   </Select>
                 </div>
-                
-                {!editingModel && getPresetsByProvider(provider).length > 0 && (
-                  <div>
-                    <Label>选择模型</Label>
-                    <Select value={selectedPreset} onValueChange={handlePresetChange}>
-                      <SelectTrigger className="mt-1">
-                        <SelectValue placeholder={`选择 ${PROVIDERS.find(p => p.value === provider)?.label} 模型`} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {getPresetsByProvider(provider).map((preset) => (
-                          <SelectItem key={preset.id} value={preset.id}>
-                            {preset.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      选择预设模型自动填充配置
-                    </p>
-                  </div>
-                )}
-                
+
+                {!editingModel && getPresetsByProvider(provider).length > 0 && (() => {
+                  const providerLabel = PROVIDERS.find(p => p.value === provider)?.label || '';
+                  const selectPresetPlaceholder = t('admin.selectPreset').replace('{provider}', providerLabel);
+                  return (
+                    <div>
+                      <Label>{t('admin.selectModel')}</Label>
+                      <Select value={selectedPreset} onValueChange={handlePresetChange}>
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder={selectPresetPlaceholder} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {getPresetsByProvider(provider).map((preset) => (
+                            <SelectItem key={preset.id} value={preset.id}>
+                              {preset.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {t('admin.presetHint')}
+                      </p>
+                    </div>
+                  );
+                })()}
+
                 <div>
-                  <Label>API Key</Label>
+                  <Label>{t('admin.apiKey')}</Label>
                   <Input
                     type="password"
-                    placeholder="sk-..."
+                    placeholder={t('admin.apiPlaceholder')}
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     className="mt-1"
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    只需填写 API Key，其他配置已预设
+                    {t('admin.apiHint')}
                   </p>
                 </div>
-                
+
                 {selectedPreset && (
                   <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-                    <h4 className="text-sm font-medium">预设配置</h4>
+                    <h4 className="text-sm font-medium">{t('admin.presetConfig')}</h4>
                     <div className="text-sm space-y-1 text-muted-foreground">
-                      <div><span className="font-medium">名称:</span> {modelName}</div>
-                      <div><span className="font-medium">模型ID:</span> {modelId}</div>
-                      <div><span className="font-medium">Base URL:</span> {baseUrl}</div>
-                      <div><span className="font-medium">描述:</span> {description}</div>
+                      <div><span className="font-medium">{t('admin.name')}:</span> {modelName}</div>
+                      <div><span className="font-medium">{t('admin.modelId')}:</span> {modelId}</div>
+                      <div><span className="font-medium">{t('admin.baseUrl')}:</span> {baseUrl}</div>
+                      <div><span className="font-medium">{t('admin.description')}:</span> {description}</div>
                     </div>
                   </div>
                 )}
-                
+
                 {!selectedPreset && (
                   <>
                     <div>
-                      <Label>模型名称</Label>
+                      <Label>{t('admin.modelName')}</Label>
                       <Input
-                        placeholder="例如：OpenAI GPT-4"
+                        placeholder={t('admin.modelPlaceholder')}
                         value={modelName}
                         onChange={(e) => setModelName(e.target.value)}
                         className="mt-1"
                       />
                     </div>
                     <div>
-                      <Label>Base URL</Label>
+                      <Label>{t('admin.baseUrl')}</Label>
                       <Input
-                        placeholder="https://api.custom.com/v1"
+                        placeholder={t('admin.urlPlaceholder')}
                         value={baseUrl}
                         onChange={(e) => setBaseUrl(e.target.value)}
                         className="mt-1"
                       />
                     </div>
                     <div>
-                      <Label>模型 ID</Label>
+                      <Label>{t('admin.modelId')}</Label>
                       <Input
-                        placeholder="gpt-4o-mini"
+                        placeholder={t('admin.idPlaceholder')}
                         value={modelId}
                         onChange={(e) => setModelId(e.target.value)}
                         className="mt-1"
                       />
                     </div>
                     <div>
-                      <Label>描述</Label>
+                      <Label>{t('admin.description')}</Label>
                       <Input
-                        placeholder="简短描述这个模型的用途"
+                        placeholder={t('admin.descPlaceholder')}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         className="mt-1"
@@ -425,7 +435,7 @@ function ModelsTab() {
                       onCheckedChange={setIsActive}
                       id="isActive"
                     />
-                    <Label htmlFor="isActive">启用</Label>
+                    <Label htmlFor="isActive">{t('admin.enable')}</Label>
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch
@@ -433,7 +443,7 @@ function ModelsTab() {
                       onCheckedChange={setIsDefault}
                       id="isDefault"
                     />
-                    <Label htmlFor="isDefault">设为默认</Label>
+                    <Label htmlFor="isDefault">{t('admin.setDefault')}</Label>
                   </div>
                 </div>
                 <Button
@@ -441,7 +451,7 @@ function ModelsTab() {
                   disabled={!modelName || !apiKey || !modelId}
                   className="w-full"
                 >
-                  {editingModel ? '保存修改' : '添加模型'}
+                  {editingModel ? t('admin.saveChanges') : t('admin.addModel')}
                 </Button>
               </div>
             </DialogContent>
@@ -449,10 +459,10 @@ function ModelsTab() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="text-center py-8 text-neutral-500">加载中...</div>
+            <div className="text-center py-8 text-neutral-500">{t('common.loading')}</div>
           ) : models.length === 0 ? (
             <div className="text-center py-8 text-neutral-500">
-              暂无模型配置，点击右上角"添加模型"开始配置
+              {t('admin.noModels')}
             </div>
           ) : (
             <div className="space-y-3">
@@ -466,12 +476,12 @@ function ModelsTab() {
                       <span className="font-medium">{model.name}</span>
                       {model.isDefault && (
                         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
-                          默认
+                          {t('admin.default')}
                         </span>
                       )}
                       {!model.isActive && (
                         <span className="text-xs bg-neutral-100 text-neutral-500 px-2 py-0.5 rounded">
-                          已停用
+                          {t('admin.disabled')}
                         </span>
                       )}
                     </div>
@@ -511,12 +521,12 @@ function ModelsTab() {
   )
 }
 
-function CreditsTab() {
+function CreditsTab({ t }: TabProps) {
   const [searchEmail, setSearchEmail] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [searchError, setSearchError] = useState('')
-  
+
   const [creditAmount, setCreditAmount] = useState('')
   const [isAddingCredits, setIsAddingCredits] = useState(false)
   const [addSuccess, setAddSuccess] = useState(false)
@@ -524,25 +534,25 @@ function CreditsTab() {
 
   const handleSearch = async () => {
     if (!searchEmail.trim()) return
-    
+
     setIsSearching(true)
     setSearchError('')
     setUserInfo(null)
     setAddSuccess(false)
-    
+
     try {
       const response = await fetch(`/api/admin/users?email=${encodeURIComponent(searchEmail)}`)
       const data = await response.json()
-      
+
       if (!data.success) {
-        setSearchError(data.error?.message || '查询失败')
+        setSearchError(data.error?.message || t('admin.searchFailed'))
         return
       }
-      
+
       setUserInfo(data.data)
     } catch (error) {
       console.error('Search user error:', error)
-      setSearchError('查询失败，请重试')
+      setSearchError(t('admin.searchFailed'))
     } finally {
       setIsSearching(false)
     }
@@ -550,17 +560,17 @@ function CreditsTab() {
 
   const handleAddCredits = async () => {
     if (!userInfo || !creditAmount) return
-    
+
     const amount = parseInt(creditAmount)
     if (isNaN(amount) || amount <= 0) {
-      setAddError('请输入有效的充值数量')
+      setAddError(t('admin.invalidAmount'))
       return
     }
-    
+
     setIsAddingCredits(true)
     setAddError('')
     setAddSuccess(false)
-    
+
     try {
       const response = await fetch('/api/admin/credits', {
         method: 'POST',
@@ -570,26 +580,26 @@ function CreditsTab() {
           amount: amount
         })
       })
-      
+
       const data = await response.json()
-      
+
       if (!data.success) {
-        setAddError(data.error?.message || '充值失败')
+        setAddError(data.error?.message || t('admin.searchFailed'))
         return
       }
-      
+
       setAddSuccess(true)
       setCreditAmount('')
-      
+
       setUserInfo({
         ...userInfo,
         remainingCredits: data.data.newBalance
       })
-      
+
       setTimeout(() => setAddSuccess(false), 3000)
     } catch (error) {
       console.error('Add credits error:', error)
-      setAddError('充值失败，请重试')
+      setAddError(t('admin.searchFailed'))
     } finally {
       setIsAddingCredits(false)
     }
@@ -597,27 +607,27 @@ function CreditsTab() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold text-neutral-900 mb-8">用户充值管理</h1>
+      <h1 className="text-3xl font-bold text-neutral-900 mb-8">{t('admin.creditsTitle')}</h1>
 
       <div className="grid md:grid-cols-2 gap-8">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Search className="h-5 w-5" />
-              查找用户
+              {t('admin.findUser')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>用户邮箱</Label>
+              <Label>{t('admin.userEmail')}</Label>
               <div className="flex gap-2 mt-1">
                 <Input
-                  placeholder="user@example.com"
+                  placeholder={t('admin.emailPlaceholder')}
                   value={searchEmail}
                   onChange={(e) => setSearchEmail(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
-                <Button 
+                <Button
                   onClick={handleSearch}
                   disabled={isSearching || !searchEmail.trim()}
                 >
@@ -645,19 +655,19 @@ function CreditsTab() {
                     <div className="text-2xl font-bold text-blue-600">
                       {userInfo.remainingCredits}
                     </div>
-                    <div className="text-neutral-500">剩余额度</div>
+                    <div className="text-neutral-500">{t('admin.remainingCredits')}</div>
                   </div>
                   <div className="text-center p-3 bg-white rounded-lg">
                     <div className="text-2xl font-bold text-neutral-900">
                       {userInfo.generationCount}
                     </div>
-                    <div className="text-neutral-500">生成次数</div>
+                    <div className="text-neutral-500">{t('admin.generationCount')}</div>
                   </div>
                   <div className="text-center p-3 bg-white rounded-lg">
                     <div className="text-2xl font-bold text-neutral-900">
                       {userInfo.saveCount}
                     </div>
-                    <div className="text-neutral-500">保存次数</div>
+                    <div className="text-neutral-500">{t('admin.saveCount')}</div>
                   </div>
                 </div>
               </div>
@@ -669,30 +679,35 @@ function CreditsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Coins className="h-5 w-5" />
-              充值额度
+              {t('admin.topUp')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {!userInfo ? (
               <div className="text-center py-8 text-neutral-400">
-                请先搜索用户
+                {t('admin.searchUser')}
               </div>
             ) : (
               <>
-                <div>
-                  <Label>充值数量（次）</Label>
-                  <Input
-                    type="number"
-                    placeholder="输入充值数量"
-                    value={creditAmount}
-                    onChange={(e) => setCreditAmount(e.target.value)}
-                    className="mt-1"
-                    min={1}
-                  />
-                  <p className="text-xs text-neutral-500 mt-1">
-                    将为 {userInfo.email} 增加额度
-                  </p>
-                </div>
+                {(() => {
+                  const amountHintText = t('admin.amountHint').replace('{email}', userInfo.email || '');
+                  return (
+                    <div>
+                      <Label>{t('admin.topUpAmount')}</Label>
+                      <Input
+                        type="number"
+                        placeholder={t('admin.amountPlaceholder')}
+                        value={creditAmount}
+                        onChange={(e) => setCreditAmount(e.target.value)}
+                        className="mt-1"
+                        min={1}
+                      />
+                      <p className="text-xs text-neutral-500 mt-1">
+                        {amountHintText}
+                      </p>
+                    </div>
+                  );
+                })()}
 
                 {addError && (
                   <div className="text-red-500 text-sm">{addError}</div>
@@ -701,7 +716,7 @@ function CreditsTab() {
                 {addSuccess && (
                   <div className="flex items-center gap-2 text-green-600 text-sm">
                     <CheckCircle className="h-4 w-4" />
-                    充值成功！
+                    {t('admin.chargeSuccess')}
                   </div>
                 )}
 
@@ -713,12 +728,12 @@ function CreditsTab() {
                   {isAddingCredits ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      充值中...
+                      {t('admin.charging')}
                     </>
                   ) : (
                     <>
                       <Coins className="h-4 w-4 mr-2" />
-                      确认充值
+                      {t('admin.confirmTopUp')}
                     </>
                   )}
                 </Button>

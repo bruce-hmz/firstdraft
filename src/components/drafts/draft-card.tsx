@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from '@/lib/next-intl'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -16,6 +17,7 @@ interface DraftCardProps {
 }
 
 export function DraftCard({ draft, onDelete, isDeleting = false }: DraftCardProps) {
+  const t = useTranslations()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const handleDelete = () => {
@@ -43,59 +45,60 @@ export function DraftCard({ draft, onDelete, isDeleting = false }: DraftCardProp
             </CardDescription>
           </div>
           <Badge variant={draft.status === 'active' ? 'default' : 'secondary'}>
-            {draft.status === 'active' ? '已发布' : '草稿'}
+            {draft.status === 'active' ? t('drafts.published') : t('drafts.draft')}
           </Badge>
         </div>
       </CardHeader>
 
       <CardContent className="pb-3">
         <p className="text-sm text-neutral-600 line-clamp-2">
-          {draft.content.description || draft.content.tagline || '暂无描述'}
+          {draft.content.description || draft.content.tagline || t('drafts.noDescription')}
         </p>
         {draft.view_count > 0 && (
           <div className="flex items-center gap-1 text-xs text-neutral-500 mt-2">
             <Eye className="h-3 w-3" />
-            {draft.view_count} 次浏览
+            {draft.view_count} {t('drafts.views')}
           </div>
         )}
       </CardContent>
 
-      <CardFooter className="pt-2 gap-2">
+      <CardFooter className="pt-2 gap-2 sm:flex-row flex-col">
         <Link href={`/share/${draft.slug}`} target="_blank" rel="noopener noreferrer">
-          <Button variant="outline" size="sm" className="flex-1">
+          <Button variant="outline" size="sm" className="flex-1 sm:flex-1 h-11">
             <ExternalLink className="h-4 w-4 mr-2" />
-            查看
+            {t('common.view')}
           </Button>
         </Link>
 
         {showDeleteConfirm ? (
-          <div className="flex gap-1 flex-1">
-            <Button 
-              variant="destructive" 
-              size="sm" 
+          <div className="flex gap-1 flex-1 sm:flex-row">
+            <Button
+              variant="destructive"
+              size="sm"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="flex-1"
+              className="flex-1 sm:flex-1 h-11"
             >
               <Trash2 className="h-4 w-4 mr-1" />
-              确认
+              {t('common.confirm')}
             </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={cancelDelete}
               disabled={isDeleting}
+              className="flex-1 sm:flex-1 h-11"
             >
-              取消
+              {t('common.cancel')}
             </Button>
           </div>
         ) : (
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="text-red-600 hover:text-red-700 hover:bg-red-50 h-11 w-11"
           >
             <Trash2 className="h-4 w-4" />
           </Button>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from '@/lib/next-intl'
 import { DraftCard } from '@/components/drafts/draft-card'
 import { EmptyDraftsState } from '@/components/drafts/empty-state'
 import { Button } from '@/components/ui/button'
@@ -10,6 +11,7 @@ import { getUserPages, deletePage } from '@/lib/pages/service'
 import type { PageDbModel } from '@/types'
 
 export function DraftList() {
+  const t = useTranslations()
   const [drafts, setDrafts] = useState<PageDbModel[]>([])
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
@@ -83,15 +85,15 @@ export function DraftList() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">My Drafts</h1>
+          <h1 className="text-2xl font-bold text-neutral-900">{t('nav.myDrafts')}</h1>
           <p className="text-neutral-600">
-            您创建的 {drafts.length} 个页面草稿
+            {t('drafts.emptyDescription')}
           </p>
         </div>
         
         <Button onClick={handleNewDraft} className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
-          新建页面
+          {t('drafts.title')}
         </Button>
       </div>
 

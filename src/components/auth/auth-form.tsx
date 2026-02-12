@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from '@/lib/next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,6 +14,7 @@ interface AuthFormProps {
 }
 
 export function AuthForm({ mode = 'signin' }: AuthFormProps) {
+  const t = useTranslations()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -51,11 +53,11 @@ export function AuthForm({ mode = 'signin' }: AuthFormProps) {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error?.message || 'Authentication failed')
+        throw new Error(data.error?.message || t('errors.authError'))
       }
 
       if (data.data?.needsConfirmation) {
-        setMessage(`确认邮件已发送至 ${data.data.email}，请检查收件箱并点击确认链接。如果没有收到，请检查垃圾邮件文件夹。`)
+        setMessage(t('auth.confirmEmail', { email: data.data.email }))
         return
       }
 
@@ -63,7 +65,7 @@ export function AuthForm({ mode = 'signin' }: AuthFormProps) {
       router.refresh()
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : t('errors.genericError'))
     } finally {
       setLoading(false)
     }
@@ -83,12 +85,12 @@ export function AuthForm({ mode = 'signin' }: AuthFormProps) {
           <span className="text-xl font-bold text-neutral-900">FirstDraft</span>
         </div>
         <CardTitle>
-          {mode === 'signin' ? '登录账户' : '创建账户'}
+          {mode === 'signin' ? t('auth.signInTitle') : t('auth.signUpTitle')}
         </CardTitle>
         <CardDescription>
-          {mode === 'signin' 
-            ? '登录以管理您的页面草稿' 
-            : '创建账户以保存和管理您的页面'
+          {mode === 'signin'
+            ? t('auth.signInDescription')
+            : t('auth.signUpDescription')
           }
         </CardDescription>
       </CardHeader>
@@ -109,13 +111,13 @@ export function AuthForm({ mode = 'signin' }: AuthFormProps) {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">邮箱</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
               <Input
                 id="email"
                 type="email"
-                placeholder="your@email.com"
+                placeholder={t('auth.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10"
@@ -125,13 +127,13 @@ export function AuthForm({ mode = 'signin' }: AuthFormProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">密码</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400" />
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t('auth.passwordPlaceholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10"
@@ -143,23 +145,23 @@ export function AuthForm({ mode = 'signin' }: AuthFormProps) {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-3">
-          <Button 
-            type="submit" 
-            className="w-full" 
+          <Button
+            type="submit"
+            className="w-full"
             disabled={loading}
           >
-            {loading ? '处理中...' : mode === 'signin' ? '登录' : '创建账户'}
+            {loading ? t('auth.processing') : (mode === 'signin' ? t('auth.signInButton') : t('auth.signUpButton'))}
           </Button>
 
-          <Button 
-            type="button" 
-            variant="ghost" 
+          <Button
+            type="button"
+            variant="ghost"
             className="w-full text-sm"
             onClick={toggleMode}
           >
-            {mode === 'signin' 
-              ? '还没有账户？点击注册' 
-              : '已有账户？点击登录'
+            {mode === 'signin'
+              ? t('auth.noAccount')
+              : t('auth.hasAccount')
             }
           </Button>
         </CardFooter>
