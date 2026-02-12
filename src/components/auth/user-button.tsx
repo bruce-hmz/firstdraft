@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { LogIn, User, LogOut, FileText, Coins, CreditCard } from 'lucide-react'
+import { LogIn, User, LogOut, FileText, Coins, CreditCard, RefreshCw } from 'lucide-react'
 import { Paywall } from '@/components/billing/Paywall'
 
 interface UserButtonProps {
@@ -23,6 +23,17 @@ export function UserButton({ className }: UserButtonProps) {
   useEffect(() => {
     checkUserAuth()
   }, [])
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (user) {
+        checkUserAuth()
+      }
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [user])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -56,6 +67,11 @@ export function UserButton({ className }: UserButtonProps) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const refreshCredits = async () => {
+    setCredits(null)
+    await checkUserAuth()
   }
 
   const handleSignOut = async () => {
@@ -109,6 +125,13 @@ export function UserButton({ className }: UserButtonProps) {
                 <p className="text-xs text-neutral-500 flex items-center gap-1">
                   <Coins className="h-3 w-3" />
                   剩余额度: {credits} 次
+                  <button
+                    onClick={refreshCredits}
+                    className="ml-1 p-0.5 hover:bg-neutral-100 rounded"
+                    title="刷新额度"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                  </button>
                 </p>
                 <button
                   onClick={() => {

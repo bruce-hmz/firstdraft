@@ -1,12 +1,36 @@
 import { AlipaySdk } from 'alipay-sdk';
 
+const appId = process.env.ALIPAY_APP_ID;
+const privateKey = process.env.ALIPAY_PRIVATE_KEY;
+const alipayPublicKey = process.env.ALIPAY_PUBLIC_KEY;
+const gateway = process.env.ALIPAY_GATEWAY || 'https://openapi.alipay.com/gateway.do';
+
+if (!appId) {
+  console.error('Missing ALIPAY_APP_ID');
+}
+if (!privateKey) {
+  console.error('Missing ALIPAY_PRIVATE_KEY');
+}
+if (!alipayPublicKey) {
+  console.error('Missing ALIPAY_PUBLIC_KEY');
+}
+
+console.log('Alipay SDK Config:', {
+  appId: appId ? `${appId.substring(0, 10)}...` : 'missing',
+  privateKeyLength: privateKey?.length || 0,
+  publicKeyLength: alipayPublicKey?.length || 0,
+  gateway,
+  isSandbox: gateway.includes('alipaydev')
+});
+
 // 初始化支付宝 SDK
 export const alipaySdk = new AlipaySdk({
-  appId: process.env.ALIPAY_APP_ID!,
-  privateKey: process.env.ALIPAY_PRIVATE_KEY!,
-  alipayPublicKey: process.env.ALIPAY_PUBLIC_KEY!,
-  gateway: process.env.ALIPAY_GATEWAY || 'https://openapi.alipay.com/gateway.do',
+  appId: appId!,
+  privateKey: privateKey!,
+  alipayPublicKey: alipayPublicKey!,
+  gateway,
   signType: 'RSA2',
+  timeout: 30000,
 });
 
 // 创建支付宝订单

@@ -68,8 +68,8 @@ export async function POST(req: NextRequest) {
 
         // 增加用户次数
         await supabase.rpc('add_credits', {
-          user_id: userId,
-          amount: credits,
+          p_user_id: userId,
+          p_amount: credits,
         });
 
         console.log('Payment processed:', orderNo, 'Credits added:', credits);
