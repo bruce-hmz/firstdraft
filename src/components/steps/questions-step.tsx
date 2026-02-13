@@ -245,7 +245,7 @@ export function QuestionsStep() {
       <div className="mb-8">
         <div className="h-2 bg-neutral-100 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-neutral-900"
+            className="h-full animate-shimmer rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ duration: 0.3 }}
@@ -284,7 +284,7 @@ export function QuestionsStep() {
               value={answers[currentQuestion.id] || ''}
               onChange={(e) => setAnswer(currentQuestion.id, e.target.value)}
               placeholder={currentQuestion.placeholder}
-              className="h-14 text-lg border-2 border-neutral-200 focus:border-neutral-400 rounded-xl"
+              className="h-14 text-lg border-2 border-neutral-200 focus:border-indigo-400 rounded-xl focus-glow transition-all"
             />
             <div className="mt-4">
               <p className="text-sm text-neutral-500 mb-2">{t('generate.selectExample')}</p>
@@ -293,7 +293,7 @@ export function QuestionsStep() {
                   <button
                     key={idx}
                     onClick={() => setAnswer(currentQuestion.id, example.trim())}
-                    className="text-sm px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition-colors"
+                    className="text-sm px-3 py-1.5 rounded-full bg-neutral-100 hover:bg-indigo-50 hover:text-indigo-600 text-neutral-600 transition-all hover:scale-105"
                   >
                     {example.trim()}
                   </button>
@@ -327,7 +327,7 @@ export function QuestionsStep() {
           <Button
             onClick={handleNext}
             disabled={isLoading}
-            className="bg-neutral-900 hover:bg-neutral-800"
+            className="glow-brand"
           >
             {isLoading ? (
               <>

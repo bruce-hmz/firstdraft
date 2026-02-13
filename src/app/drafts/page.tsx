@@ -14,7 +14,7 @@ export default function DraftsPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-neutral-50 to-white py-8">
+    <main className="min-h-screen bg-gradient-to-b from-neutral-50 to-white pt-24 pb-8">
       <Navbar />
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
       <div className="max-w-6xl mx-auto px-6">

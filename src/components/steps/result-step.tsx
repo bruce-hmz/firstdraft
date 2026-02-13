@@ -216,18 +216,6 @@ export function ResultStep() {
         </motion.div>
       )}
 
-      <div className="flex justify-center gap-4">
-        <Button variant="outline" className="gap-2">
-          <Download className="h-4 w-4" />
-          保存项目
-          <Badge variant="secondary" className="ml-1 text-xs">Pro</Badge>
-        </Button>
-        <Button variant="outline" className="gap-2">
-          <RefreshCw className="h-4 w-4" />
-          重新生成
-          <Badge variant="secondary" className="ml-1 text-xs">Pro</Badge>
-        </Button>
-      </div>
     </div>
   );
 }

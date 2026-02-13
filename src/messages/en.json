@@ -194,16 +194,20 @@
     },
     "plans": {
       "0": {
-        "name": "Starter",
-        "description": "Perfect for trying out"
+        "name": "Trial",
+        "description": "Perfect for first try"
       },
       "1": {
-        "name": "Popular",
-        "description": "Best value for creators"
+        "name": "Lite",
+        "description": "Best for regular users"
       },
       "2": {
+        "name": "Standard",
+        "description": "Great value choice"
+      },
+      "3": {
         "name": "Pro",
-        "description": "For power users and teams"
+        "description": "For heavy users"
       }
     }
   },

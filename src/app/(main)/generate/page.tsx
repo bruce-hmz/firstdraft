@@ -35,7 +35,7 @@ export default function GeneratePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-neutral-50 to-white py-8">
+    <main className="min-h-screen bg-gradient-to-b from-neutral-50 to-white pt-24 pb-8">
       <div className="max-w-4xl mx-auto px-6">
         {step !== 'generating' && step !== 'result' && (
           <Button

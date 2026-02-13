@@ -16,10 +16,18 @@ const ADMIN_EMAIL = '123387447@qq.com';
 
 export function Navbar({ showBackButton = false, onBack }: NavbarProps) {
   const [isAdmin, setIsAdmin] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     checkAdminStatus();
+    
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const checkAdminStatus = async () => {
@@ -36,10 +44,10 @@ export function Navbar({ showBackButton = false, onBack }: NavbarProps) {
   };
 
   return (
-    <nav className="w-full px-4 sm:px-6 py-4 flex justify-between items-center border-b border-neutral-100">
+    <nav className={`w-full px-4 sm:px-6 py-4 flex justify-between items-center fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-md shadow-sm border-b border-neutral-100/50' : 'bg-transparent'}`}>
       <div className="flex items-center gap-2">
-        <Link href="/" className="flex items-center gap-2">
-          <Sparkles className="h-6 w-6 text-neutral-900" />
+        <Link href="/" className="flex items-center gap-2 group">
+          <Sparkles className="h-6 w-6 text-indigo-600 transition-transform group-hover:rotate-12" />
           <span className="text-xl font-bold text-neutral-900">FirstDraft</span>
         </Link>
         {showBackButton && onBack && (

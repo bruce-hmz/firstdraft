@@ -34,7 +34,7 @@ export function DraftCard({ draft, onDelete, isDeleting = false }: DraftCardProp
   }
 
   return (
-    <Card className="group hover:shadow-md transition-shadow">
+    <Card className="group hover-lift transition-all duration-300">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">

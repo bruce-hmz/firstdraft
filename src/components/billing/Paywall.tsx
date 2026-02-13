@@ -41,7 +41,7 @@ export function Paywall({ onClose }: PaywallProps) {
 
       if (data.plans && Array.isArray(data.plans) && data.plans.length > 0) {
         setPlans(data.plans);
-        setSelectedPlan(data.plans[1]?.id || data.plans[0]?.id);
+        setSelectedPlan(data.plans[2]?.id || data.plans[0]?.id);
       } else {
         console.error('No plans returned or invalid format:', data);
         setPlans([]);
@@ -150,40 +150,40 @@ export function Paywall({ onClose }: PaywallProps) {
           </div>
 
           {/* Plan selection */}
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {plans.map((plan, index) => (
               <div
                 key={plan.id}
                 onClick={() => setSelectedPlan(plan.id)}
                 className={selectedPlan === plan.id
-                  ? 'relative p-6 rounded-xl border-2 cursor-pointer transition-all border-blue-500 bg-blue-50'
-                  : 'relative p-6 rounded-xl border-2 cursor-pointer transition-all border-neutral-200 hover:border-neutral-300'
+                  ? 'relative p-4 rounded-xl border-2 cursor-pointer transition-all border-blue-500 bg-blue-50'
+                  : 'relative p-4 rounded-xl border-2 cursor-pointer transition-all border-neutral-200 hover:border-neutral-300'
                 }
               >
-                {index === 1 && (
+                {index === 2 && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
                     {t('billing.recommended')}
                   </div>
                 )}
 
                 <div className="text-center">
-                  <h4 className="font-semibold text-neutral-900 mb-1">{t(`billing.plans.${index}.name`)}</h4>
-                  <p className="text-sm text-neutral-500 mb-4">{t(`billing.plans.${index}.description`)}</p>
+                  <h4 className="font-semibold text-neutral-900 mb-1 text-sm">{t(`billing.plans.${index}.name`)}</h4>
+                  <p className="text-xs text-neutral-500 mb-3">{t(`billing.plans.${index}.description`)}</p>
 
-                  <div className="mb-4">
-                    <span className="text-3xl font-bold text-neutral-900">{'¥' + formatPrice(plan.price_cny)}</span>
+                  <div className="mb-3">
+                    <span className="text-2xl font-bold text-neutral-900">{'¥' + formatPrice(plan.price_cny)}</span>
                   </div>
 
-                  <div className="text-2xl font-bold text-blue-600 mb-1">
-                    {plan.credits} <span className="text-sm font-normal text-neutral-500">{t('common.times')}</span>
+                  <div className="text-xl font-bold text-blue-600 mb-1">
+                    {plan.credits} <span className="text-xs font-normal text-neutral-500">{t('common.times')}</span>
                   </div>
                   <p className="text-xs text-neutral-400">
                     {'¥' + ((plan.price_cny / plan.credits / 100).toFixed(2)) + t('common.per_time')}
                   </p>
 
                   {selectedPlan === plan.id && (
-                    <div className="absolute top-4 right-4 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                      <Check className="h-3 w-3 text-white" />
+                    <div className="absolute top-3 right-3 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                      <Check className="h-2.5 w-2.5 text-white" />
                     </div>
                   )}
                 </div>

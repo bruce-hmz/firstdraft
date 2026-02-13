@@ -194,16 +194,20 @@
     },
     "plans": {
       "0": {
-        "name": "入门版",
-        "description": "适合初次体验"
+        "name": "体验包",
+        "description": "适合初次尝鲜"
       },
       "1": {
-        "name": "热门版",
-        "description": "创作者的最佳选择"
+        "name": "轻量包",
+        "description": "普通用户首选"
       },
       "2": {
-        "name": "专业版",
-        "description": "适合专业用户和团队"
+        "name": "标准包",
+        "description": "性价比之选"
+      },
+      "3": {
+        "name": "专业包",
+        "description": "重度用户推荐"
       }
     }
   },

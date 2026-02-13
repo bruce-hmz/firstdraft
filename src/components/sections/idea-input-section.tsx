@@ -41,7 +41,7 @@ export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
+    <Card className="w-full max-w-2xl mx-auto hover-lift transition-all duration-300">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl">
           {t('home.ideaInputTitle')}
@@ -57,7 +57,7 @@ export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
             placeholder={t('home.ideaPlaceholder')}
             value={idea}
             onChange={(e) => setIdeaState(e.target.value)}
-            className="min-h-32 resize-none text-base"
+            className="min-h-32 resize-none text-base focus-glow border-2 border-neutral-200 focus:border-indigo-400 transition-all"
             disabled={isGenerating}
           />
 
@@ -66,7 +66,7 @@ export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
               type="submit"
               size="lg"
               disabled={isGenerating || !idea.trim() || idea.trim().length < 5}
-              className="gap-2 px-8"
+              className="gap-2 px-8 glow-brand"
             >
               {isGenerating ? (
                 <>
