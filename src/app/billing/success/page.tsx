@@ -125,7 +125,7 @@ function BillingSuccessContent() {
 
           <div className="bg-neutral-50 rounded-lg p-4 mb-6">
             <h3 className="font-semibold text-neutral-900 mb-2">
-              {isProPlan ? t('billing.success.proBenefits') : t('billing.success.planBenefits', { planName: orderInfo?.planName })}
+              {isProPlan ? t('billing.success.proBenefits') : t('billing.success.planBenefits', { planName: orderInfo?.planName || '' })}
             </h3>
             <ul className="text-left text-sm text-neutral-600 space-y-2">
               <li className="flex items-center gap-2">

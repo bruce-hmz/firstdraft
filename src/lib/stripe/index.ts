@@ -1,8 +1,31 @@
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+let stripeInstance: Stripe | null = null
+
+function getStripe(): Stripe {
+  if (!stripeInstance) {
+    const secretKey = process.env.STRIPE_SECRET_KEY
+    if (!secretKey) {
+      throw new Error('STRIPE_SECRET_KEY is not configured')
+    }
+    stripeInstance = new Stripe(secretKey, {
+      apiVersion: '2026-01-28.clover',
+    })
+  }
+  return stripeInstance
+}
+
+// Export a proxy that lazily initializes Stripe
+export const stripe = new Proxy({} as Stripe, {
+  get(target, prop) {
+    const instance = getStripe()
+    const value = instance[prop as keyof Stripe]
+    if (typeof value === 'function') {
+      return value.bind(instance)
+    }
+    return value
+  }
 })
 
 export const STRIPE_PRICE_ID_PRO = process.env.STRIPE_PRICE_ID_PRO!
