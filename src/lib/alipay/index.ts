@@ -1,37 +1,53 @@
 import { AlipaySdk } from 'alipay-sdk';
 
-const appId = process.env.ALIPAY_APP_ID;
-const privateKey = process.env.ALIPAY_PRIVATE_KEY;
-const alipayPublicKey = process.env.ALIPAY_PUBLIC_KEY;
-const gateway = process.env.ALIPAY_GATEWAY || 'https://openapi.alipay.com/gateway.do';
+let alipaySdkInstance: AlipaySdk | null = null;
 
-if (!appId) {
-  console.error('Missing ALIPAY_APP_ID');
-}
-if (!privateKey) {
-  console.error('Missing ALIPAY_PRIVATE_KEY');
-}
-if (!alipayPublicKey) {
-  console.error('Missing ALIPAY_PUBLIC_KEY');
+function getAlipaySdk(): AlipaySdk {
+  if (!alipaySdkInstance) {
+    const appId = process.env.ALIPAY_APP_ID;
+    const privateKey = process.env.ALIPAY_PRIVATE_KEY;
+    const alipayPublicKey = process.env.ALIPAY_PUBLIC_KEY;
+    const gateway = process.env.ALIPAY_GATEWAY || 'https://openapi.alipay.com/gateway.do';
+
+    if (!appId) {
+      throw new Error('ALIPAY_APP_ID is not configured');
+    }
+    if (!privateKey) {
+      throw new Error('ALIPAY_PRIVATE_KEY is not configured');
+    }
+    if (!alipayPublicKey) {
+      throw new Error('ALIPAY_PUBLIC_KEY is not configured');
+    }
+
+    alipaySdkInstance = new AlipaySdk({
+      appId,
+      privateKey,
+      alipayPublicKey,
+      gateway,
+      signType: 'RSA2',
+      timeout: 30000,
+    });
+
+    console.log('Alipay SDK initialized:', {
+      appId: appId.substring(0, 10) + '...',
+      gateway,
+      isSandbox: gateway.includes('alipaydev')
+    });
+  }
+  return alipaySdkInstance;
 }
 
-console.log('Alipay SDK Config:', {
-  appId: appId ? `${appId.substring(0, 10)}...` : 'missing',
-  privateKeyLength: privateKey?.length || 0,
-  publicKeyLength: alipayPublicKey?.length || 0,
-  gateway,
-  isSandbox: gateway.includes('alipaydev')
-});
-
-// 初始化支付宝 SDK
-export const alipaySdk = new AlipaySdk({
-  appId: appId!,
-  privateKey: privateKey!,
-  alipayPublicKey: alipayPublicKey!,
-  gateway,
-  signType: 'RSA2',
-  timeout: 30000,
-});
+// Export a proxy that lazily initializes AlipaySdk
+export const alipaySdk = new Proxy({} as AlipaySdk, {
+  get(target, prop) {
+    const instance = getAlipaySdk()
+    const value = (instance as any)[prop]
+    if (typeof value === 'function') {
+      return value.bind(instance)
+    }
+    return value
+  }
+})
 
 // 创建支付宝订单
 export async function createAlipayOrder(
@@ -42,7 +58,8 @@ export async function createAlipayOrder(
   notifyUrl: string,
   returnUrl: string
 ) {
-  const result = await alipaySdk.exec('alipay.trade.page.pay', {
+  const sdk = getAlipaySdk();
+  const result = await sdk.exec('alipay.trade.page.pay', {
     notify_url: notifyUrl,
     return_url: returnUrl,
     bizContent: {
@@ -59,7 +76,8 @@ export async function createAlipayOrder(
 
 // 查询订单状态
 export async function queryAlipayOrder(orderNo: string) {
-  const result = await alipaySdk.exec('alipay.trade.query', {
+  const sdk = getAlipaySdk();
+  const result = await sdk.exec('alipay.trade.query', {
     bizContent: {
       out_trade_no: orderNo,
     },
@@ -70,5 +88,6 @@ export async function queryAlipayOrder(orderNo: string) {
 
 // 验证支付宝回调签名
 export function verifyAlipayNotify(params: Record<string, string>) {
-  return alipaySdk.checkNotifySign(params);
+  const sdk = getAlipaySdk();
+  return sdk.checkNotifySign(params);
 }
