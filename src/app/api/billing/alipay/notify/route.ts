@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+// TODO: 支付宝支付功能 - 后期接入时取消注释
+// 需要配置环境变量：ALIPAY_APP_ID, ALIPAY_PRIVATE_KEY, ALIPAY_PUBLIC_KEY
+
+/*
 import { createClient } from '@supabase/supabase-js';
 import { AlipaySdk } from 'alipay-sdk';
 
@@ -25,14 +30,14 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.formData();
     const params: Record<string, string> = {};
-    
+
     body.forEach((value, key) => {
       params[key] = value.toString();
     });
 
     // 验证签名
     const isValid = alipaySdk.checkNotifySign(params);
-    
+
     if (!isValid) {
       console.error('Invalid alipay notify signature');
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -88,4 +93,12 @@ export async function POST(req: NextRequest) {
     console.error('Alipay notify error:', error);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
+}
+*/
+
+export async function POST(req: NextRequest) {
+  return NextResponse.json({
+    error: 'Alipay payment is not enabled',
+    message: '支付宝支付功能暂未开放，请联系管理员'
+  }, { status: 503 });
 }

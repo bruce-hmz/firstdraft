@@ -1,9 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
+
+// TODO: 支付宝支付功能 - 后期接入时取消注释
+// 需要配置环境变量：ALIPAY_APP_ID, ALIPAY_PRIVATE_KEY, ALIPAY_PUBLIC_KEY
+
+export async function POST(req: NextRequest) {
+  return NextResponse.json({
+    error: 'Alipay payment is not enabled',
+    message: '支付宝支付功能暂未开放，请联系管理员'
+  }, { status: 503 });
+}
+
+/*
+// 原始实现 - 后期接入时取消注释
 import { createClient } from '@/lib/supabase/server';
 
 function formatPrivateKey(key: string): string {
   let cleanKey = key.trim();
-  
+
   if (cleanKey.includes('-----BEGIN RSA PRIVATE KEY-----')) {
     const match = cleanKey.match(/-----BEGIN RSA PRIVATE KEY-----\n?([\s\S]*?)\n?-----END RSA PRIVATE KEY-----/);
     if (match) {
@@ -12,13 +25,13 @@ function formatPrivateKey(key: string): string {
       return `-----BEGIN RSA PRIVATE KEY-----\n${formattedBody}\n-----END RSA PRIVATE KEY-----`;
     }
   }
-  
+
   if (cleanKey.includes('-----BEGIN') && cleanKey.includes('-----END')) {
     const headerMatch = cleanKey.match(/(-----BEGIN\w+-----)([\s\S]*?)(-----END\w+-----)/);
     if (headerMatch) {
       const body = headerMatch[2].replace(/\s+/g, '');
       const formattedBody = body.match(/.{1,64}/g)?.join('\n') || body;
-      
+
       const rawHeader = headerMatch[1];
       let header = '-----BEGIN RSA PRIVATE KEY-----';
       if (rawHeader.includes('PRIVATEKEY') && !rawHeader.includes('RSA')) {
@@ -28,7 +41,7 @@ function formatPrivateKey(key: string): string {
       return `${header}\n${formattedBody}\n-----END RSA PRIVATE KEY-----`;
     }
   }
-  
+
   const cleanBody = cleanKey.replace(/\s+/g, '');
   const formattedBody = cleanBody.match(/.{1,64}/g)?.join('\n') || cleanBody;
   return `-----BEGIN RSA PRIVATE KEY-----\n${formattedBody}\n-----END RSA PRIVATE KEY-----`;
@@ -79,9 +92,9 @@ export async function POST(req: NextRequest) {
 
     if (orderError) {
       console.error('Create order error:', orderError);
-      return NextResponse.json({ 
-        error: 'Failed to create order', 
-        details: orderError.message 
+      return NextResponse.json({
+        error: 'Failed to create order',
+        details: orderError.message
       }, { status: 500 });
     }
 
@@ -90,7 +103,7 @@ export async function POST(req: NextRequest) {
     const gateway = process.env.ALIPAY_GATEWAY || 'https://openapi.alipay.com/gateway.do';
 
     if (!appId || !privateKey) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         error: 'Missing Alipay configuration',
         details: `APP_ID: ${appId ? 'set' : 'missing'}, PRIVATE_KEY: ${privateKey ? 'set' : 'missing'}`
       }, { status: 500 });
@@ -138,7 +151,7 @@ export async function POST(req: NextRequest) {
       const queryString = sortedKeys
         .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
         .join('&');
-      
+
       const payUrl = `${gateway}?${queryString}&sign=${encodeURIComponent(sign)}`;
 
       return NextResponse.json({
@@ -164,3 +177,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+*/
