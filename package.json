@@ -21,6 +21,7 @@
     "nanoid": "^5.1.6",
     "next": "16.1.6",
     "next-intl": "^4.8.3",
+    "nodemailer": "^8.0.1",
     "openai": "^6.17.0",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
@@ -32,6 +33,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^7.0.10",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/stripe": "^8.0.416",
