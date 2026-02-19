@@ -149,7 +149,9 @@
     "noAccount": "还没有账户？点击注册",
     "hasAccount": "已有账户？点击登录",
     "processing": "处理中...",
-    "confirmEmail": "确认邮件已发送至 {email}，请检查收件箱并点击确认链接。如果没有收到，请检查垃圾邮件文件夹。"
+    "confirmEmail": "确认邮件已发送至 {email}，请检查收件箱并点击确认链接。如果没有收到，请检查垃圾邮件文件夹。",
+    "loginRequired": "请先登录后再使用",
+    "loginRequiredDescription": "登录后即可使用 AI 生成功能，创建属于你的产品页面"
   },
   "billing": {
     "title": "购买生成额度",
@@ -169,6 +171,11 @@
     "paymentError": "创建支付会话失败，请重试",
     "paymentUnavailable": "支付系统暂时不可用",
     "getCredits": "获取额度",
+    "followTitle": "还想解锁更多使用？",
+    "followDescription": "关注我们的公众号，获取更多使用次数和专属福利",
+    "wechatOfficialAccount": "微信公众号",
+    "followInstructions": "在微信中搜索「麻瓜补习社」并关注，即可获得更多使用机会",
+    "followHint": "关注公众号后，回复关键词即可获得额外的免费使用次数",
     "success": {
       "verifying": "正在确认您的支付...",
       "plan": "套餐",

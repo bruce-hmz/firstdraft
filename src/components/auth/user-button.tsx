@@ -86,6 +86,35 @@ export function UserButton({ className }: UserButtonProps) {
 
   const isDraftsPage = pathname === '/drafts'
 
+  // 未登录状态：显示登录按钮
+  if (!user && !loading) {
+    return (
+      <div className={className}>
+        <Link href="/login">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 h-8 sm:h-9"
+          >
+            <LogIn className="h-4 w-4" />
+            <span className="text-sm font-medium">{t('nav.login')}</span>
+          </Button>
+        </Link>
+      </div>
+    )
+  }
+
+  // 加载状态
+  if (loading) {
+    return (
+      <div className={className}>
+        <Button variant="ghost" className="flex items-center gap-2 h-8 sm:h-9" disabled>
+          <div className="h-8 w-8 rounded-full bg-neutral-100 animate-pulse" />
+        </Button>
+      </div>
+    )
+  }
+
+  // 已登录状态：显示用户菜单
   return (
     <div className={`relative ${className}`} data-user-button>
       <Button
@@ -108,7 +137,7 @@ export function UserButton({ className }: UserButtonProps) {
         <div className={`absolute right-0 top-full mt-2 sm:mt-3 w-48 sm:w-56 bg-white border border-neutral-200 rounded-lg shadow-lg z-50 ${isMobileMenuOpen ? 'sm:hidden' : ''}`}>
           <div className="px-4 py-3 border-b border-neutral-100">
             <p className="text-sm font-medium text-neutral-900 truncate">{user?.email}</p>
-            
+
             {credits !== null && (
               <div className="mt-2">
                 <div className="flex items-center justify-between">
@@ -126,7 +155,7 @@ export function UserButton({ className }: UserButtonProps) {
                 </div>
               </div>
             )}
-            
+
             {credits !== null && (
               <button
                 onClick={() => {
@@ -151,16 +180,17 @@ export function UserButton({ className }: UserButtonProps) {
               <span className="font-medium">{t('nav.myDrafts')}</span>
             </Link>
 
-            <form action="/api/auth/signout" method="post">
-              <Button
-                variant="ghost"
-                className="w-full justify-start px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                type="submit"
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                {t('nav.logout')}
-              </Button>
-            </form>
+            <Button
+              variant="ghost"
+              className="w-full justify-start px-3 py-2 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+              onClick={() => {
+                handleSignOut()
+                setIsOpen(false)
+              }}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              {t('nav.logout')}
+            </Button>
           </nav>
         </div>
       )}

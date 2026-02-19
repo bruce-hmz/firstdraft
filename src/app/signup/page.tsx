@@ -2,13 +2,13 @@
 
 import { Suspense } from 'react'
 import { useTranslations } from '@/lib/next-intl'
-import { AuthForm } from '@/components/auth/auth-form'
+import { SignupForm } from '@/components/auth/signup-form'
 
 function SignupPageContent() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center px-4">
+    <main className="min-h-screen bg-gradient-to-b from-neutral-50 to-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <AuthForm mode="signup" />
+        <SignupForm />
       </div>
     </main>
   )

@@ -149,7 +149,9 @@
     "noAccount": "Don't have an account? Click to sign up",
     "hasAccount": "Already have an account? Click to sign in",
     "processing": "Processing...",
-    "confirmEmail": "Confirmation email sent to {email}. Please check your inbox and click the confirmation link. If you don't receive it, please check your spam folder."
+    "confirmEmail": "Confirmation email sent to {email}. Please check your inbox and click the confirmation link. If you don't receive it, please check your spam folder.",
+    "loginRequired": "Please login to continue",
+    "loginRequiredDescription": "Login to use the AI generation feature and create your product pages"
   },
   "billing": {
     "title": "Purchase Generation Credits",
@@ -169,6 +171,11 @@
     "paymentError": "Failed to create payment session, please try again",
     "paymentUnavailable": "Payment system temporarily unavailable",
     "getCredits": "Get Credits",
+    "followTitle": "Want to unlock more usage?",
+    "followDescription": "Follow our official account to get more usage credits and exclusive benefits",
+    "wechatOfficialAccount": "WeChat Official Account",
+    "followInstructions": "Search for「麻瓜补习社」in WeChat and follow to get more usage opportunities",
+    "followHint": "After following, reply with keywords to get additional free usage credits",
     "success": {
       "verifying": "Verifying your payment...",
       "plan": "Plan",
