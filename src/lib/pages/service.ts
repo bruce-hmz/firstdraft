@@ -1,20 +1,30 @@
 import { createClient } from '@supabase/supabase-js'
 import type { PageDbModel, CreatePageInput, PageContent } from '@/types'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+import type { SupabaseClient } from '@supabase/supabase-js'
 
-if (!supabaseUrl || !supabaseServiceKey) {
-  throw new Error('Supabase environment variables not configured')
+let supabaseInstance: SupabaseClient | null = null
+
+function getSupabase(): SupabaseClient {
+  if (!supabaseInstance) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      throw new Error('Supabase environment variables not configured')
+    }
+
+    supabaseInstance = createClient(supabaseUrl, supabaseServiceKey)
+  }
+  return supabaseInstance
 }
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
 const PAGE_TABLE = 'pages'
 
 export async function createPage(input: CreatePageInput & { userId?: string; anonymousId?: string }): Promise<PageDbModel | null> {
+  const supabase = getSupabase()
   console.log('Creating page with input:', { title: input.title, hasUser: !!input.userId, hasAnonymous: !!input.anonymousId })
-  
+
   const slug = await generateUniqueSlug()
   console.log('Generated slug:', slug)
 
@@ -26,7 +36,7 @@ export async function createPage(input: CreatePageInput & { userId?: string; ano
     user_id: input.userId || null,
     anonymous_id: input.anonymousId || null,
   }
-  
+
   console.log('Inserting data:', JSON.stringify(insertData, null, 2))
 
   const { data, error } = await supabase
@@ -48,6 +58,7 @@ export async function createPage(input: CreatePageInput & { userId?: string; ano
 }
 
 export async function getPageBySlug(slug: string): Promise<PageDbModel | null> {
+  const supabase = getSupabase()
   const { data, error } = await supabase
     .from(PAGE_TABLE)
     .select('*')
@@ -67,6 +78,7 @@ export async function getPageBySlug(slug: string): Promise<PageDbModel | null> {
 }
 
 export async function incrementViewCount(slug: string): Promise<void> {
+  const supabase = getSupabase()
   const { error } = await supabase.rpc('increment_view_count', { page_slug: slug })
 
   if (error) {
@@ -75,6 +87,7 @@ export async function incrementViewCount(slug: string): Promise<void> {
 }
 
 export async function deletePage(id: string, userId?: string): Promise<boolean> {
+  const supabase = getSupabase()
   let query = supabase
     .from(PAGE_TABLE)
     .update({ status: 'deleted' })
@@ -95,6 +108,7 @@ export async function deletePage(id: string, userId?: string): Promise<boolean> 
 }
 
 export async function generateUniqueSlug(): Promise<string> {
+  const supabase = getSupabase()
   const { data, error } = await supabase.rpc('generate_unique_slug')
 
   if (error || !data) {
@@ -111,6 +125,7 @@ export async function generateUniqueSlug(): Promise<string> {
 }
 
 export async function getRecentPages(limit = 10): Promise<PageDbModel[]> {
+  const supabase = getSupabase()
   const { data, error } = await supabase
     .from(PAGE_TABLE)
     .select('*')
@@ -128,6 +143,7 @@ export async function getRecentPages(limit = 10): Promise<PageDbModel[]> {
 
 export async function getUserPages(userId: string, options: { limit?: number; offset?: number } = {}): Promise<PageDbModel[]> {
   const { limit = 20, offset = 0 } = options
+  const supabase = getSupabase()
 
   const { data, error } = await supabase
     .from(PAGE_TABLE)
