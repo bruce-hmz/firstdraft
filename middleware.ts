@@ -1,67 +1,83 @@
-import { createClient } from '@/lib/supabase/server'
 import { NextResponse, NextRequest } from 'next/server'
 import { COOKIE_NAME, QUERY_PARAM, locales, type Locale, defaultLocale } from '@/i18n/config'
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  try {
+    const { pathname } = request.nextUrl
 
-  // Language detection
-  let locale: Locale = defaultLocale
-  const queryLocale = request.nextUrl.searchParams.get(QUERY_PARAM)
+    // Language detection
+    let locale: Locale = defaultLocale
+    const queryLocale = request.nextUrl.searchParams.get(QUERY_PARAM)
 
-  // Priority: Query param > Cookie > Default
-  if (queryLocale && locales.includes(queryLocale as Locale)) {
-    locale = queryLocale as Locale
-  } else {
-    const cookieLocale = request.cookies.get(COOKIE_NAME)?.value
-    if (cookieLocale && locales.includes(cookieLocale as Locale)) {
-      locale = cookieLocale as Locale
+    // Priority: Query param > Cookie > Default
+    if (queryLocale && locales.includes(queryLocale as Locale)) {
+      locale = queryLocale as Locale
+    } else {
+      const cookieLocale = request.cookies.get(COOKIE_NAME)?.value
+      if (cookieLocale && locales.includes(cookieLocale as Locale)) {
+        locale = cookieLocale as Locale
+      }
     }
-  }
 
-  // Create response with locale cookie
-  const response = NextResponse.next({
-    request: { headers: request.headers },
-  })
-
-  // Set locale cookie if not already set or different
-  if (!request.cookies.get(COOKIE_NAME) || request.cookies.get(COOKIE_NAME)?.value !== locale) {
-    response.cookies.set(COOKIE_NAME, locale, {
-      maxAge: 31536000, // 1 year
-      path: '/',
-      sameSite: 'lax',
+    // Create response with locale cookie
+    const response = NextResponse.next({
+      request: { headers: request.headers },
     })
-  }
 
-  // Skip public API routes
-  const publicApiRoutes = ['/api/billing/plans', '/api/generate/questions']
-  if (publicApiRoutes.some(route => pathname.startsWith(route))) {
+    // Set locale cookie if not already set or different
+    if (!request.cookies.get(COOKIE_NAME) || request.cookies.get(COOKIE_NAME)?.value !== locale) {
+      response.cookies.set(COOKIE_NAME, locale, {
+        maxAge: 31536000, // 1 year
+        path: '/',
+        sameSite: 'lax',
+      })
+    }
+
+    // Skip auth check for public API routes
+    const publicApiRoutes = ['/api/billing/plans', '/api/generate/questions']
+    if (publicApiRoutes.some(route => pathname.startsWith(route))) {
+      return response
+    }
+
+    // Skip auth check if Supabase is not configured
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.warn('Supabase not configured, skipping auth check in middleware')
+      return response
+    }
+
+    // Dynamic import to avoid build-time errors
+    const { createClient } = await import('@/lib/supabase/server')
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const protectedRoutes = ['/drafts']
+    const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
+
+    const authRoutes = ['/login', '/signup']
+    const isAuthRoute = authRoutes.includes(pathname)
+
+    if (!user && isProtectedRoute) {
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('redirectTo', pathname)
+      loginUrl.searchParams.set(QUERY_PARAM, locale)
+      return NextResponse.redirect(loginUrl)
+    }
+
+    if (user && isAuthRoute) {
+      const draftsUrl = new URL('/drafts', request.url)
+      draftsUrl.searchParams.set(QUERY_PARAM, locale)
+      return NextResponse.redirect(draftsUrl)
+    }
+
     return response
+  } catch (error) {
+    console.error('Middleware error:', error)
+    // Return a basic response to avoid 500 error
+    return NextResponse.next()
   }
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  const protectedRoutes = ['/drafts']
-  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route))
-
-  const authRoutes = ['/login', '/signup']
-  const isAuthRoute = authRoutes.includes(pathname)
-
-  if (!user && isProtectedRoute) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirectTo', pathname)
-    loginUrl.searchParams.set(QUERY_PARAM, locale)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  if (user && isAuthRoute) {
-    const draftsUrl = new URL('/drafts', request.url)
-    draftsUrl.searchParams.set(QUERY_PARAM, locale)
-    return NextResponse.redirect(draftsUrl)
-  }
-
-  return response
 }
 
 export const config = {
