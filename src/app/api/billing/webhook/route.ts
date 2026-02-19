@@ -20,7 +20,7 @@ function createAdminClient() {
 
 export async function POST(req: NextRequest) {
   const payload = await req.text();
-  const signature = headers().get('stripe-signature')!;
+  const signature = (await headers()).get('stripe-signature')!;
 
   let event: Stripe.Event;
 
