@@ -10,37 +10,64 @@ interface EmailOptions {
   text?: string
 }
 
-// 创建 Gmail SMTP 传输器
-function createGmailTransporter() {
+// 创建 SMTP 传输器（支持 Gmail、QQ邮箱、163邮箱）
+function createSmtpTransporter() {
   const SMTP_USER = process.env.SMTP_USER
   const SMTP_PASS = process.env.SMTP_PASS
+  const SMTP_SERVICE = process.env.SMTP_SERVICE || 'gmail'
 
   if (!SMTP_USER || !SMTP_PASS) {
     return null
   }
 
+  // 根据邮箱类型选择配置
+  const serviceConfigs: Record<string, { host: string; port: number; secure: boolean }> = {
+    gmail: { host: 'smtp.gmail.com', port: 587, secure: false },
+    qq: { host: 'smtp.qq.com', port: 465, secure: true },
+    '163': { host: 'smtp.163.com', port: 465, secure: true },
+    '126': { host: 'smtp.126.com', port: 465, secure: true },
+  }
+
+  // 自动检测邮箱类型
+  let service = SMTP_SERVICE.toLowerCase()
+  if (SMTP_USER.includes('@qq.com')) service = 'qq'
+  else if (SMTP_USER.includes('@163.com')) service = '163'
+  else if (SMTP_USER.includes('@126.com')) service = '126'
+
+  const config = serviceConfigs[service] || serviceConfigs.gmail
+
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
     auth: {
       user: SMTP_USER,
-      pass: SMTP_PASS, // Gmail 应用专用密码
+      pass: SMTP_PASS,
     },
+    connectionTimeout: 10000,
+    socketTimeout: 10000,
   })
 }
 
-// 使用 Gmail SMTP 发送邮件
-async function sendWithGmail(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
-  const transporter = createGmailTransporter()
+// 使用 SMTP 发送邮件（支持 Gmail、QQ、163 等）
+async function sendWithSmtp(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
+  const transporter = createSmtpTransporter()
 
   if (!transporter) {
-    return { success: false, error: 'Gmail SMTP not configured' }
+    return { success: false, error: 'SMTP not configured' }
   }
 
   const SMTP_USER = process.env.SMTP_USER
   const EMAIL_FROM = process.env.EMAIL_FROM || SMTP_USER
 
+  // 检测邮箱服务类型
+  let serviceType = 'SMTP'
+  if (SMTP_USER?.includes('@qq.com')) serviceType = 'QQ邮箱'
+  else if (SMTP_USER?.includes('@163.com')) serviceType = '163邮箱'
+  else if (SMTP_USER?.includes('@gmail.com')) serviceType = 'Gmail'
+
   try {
-    const info = await transporter.sendMail({
+    const sendPromise = transporter.sendMail({
       from: EMAIL_FROM,
       to: options.to,
       subject: options.subject,
@@ -48,13 +75,19 @@ async function sendWithGmail(options: EmailOptions): Promise<{ success: boolean;
       text: options.text,
     })
 
-    console.log('Email sent via Gmail:', info.messageId)
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error('SMTP connection timeout (15s)')), 15000)
+    })
+
+    const info = await Promise.race([sendPromise, timeoutPromise])
+
+    console.log(`Email sent via ${serviceType}:`, info.messageId)
     return { success: true }
   } catch (error) {
-    console.error('Gmail SMTP error:', error)
+    console.error(`${serviceType} SMTP error:`, error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Gmail SMTP error'
+      error: error instanceof Error ? error.message : `${serviceType} SMTP error`
     }
   }
 }
@@ -221,14 +254,14 @@ export async function sendVerificationEmail(
     return { success: true, message: 'Verification code logged to console (dev mode)' }
   }
 
-  // 优先使用 Gmail SMTP
+  // 优先使用 SMTP（支持 Gmail、QQ、163 等）
   if (process.env.SMTP_USER && process.env.SMTP_PASS) {
-    const result = await sendWithGmail({ to: email, subject, html, text })
+    const result = await sendWithSmtp({ to: email, subject, html, text })
     if (result.success) {
-      return { success: true, message: 'Verification code sent successfully via Gmail' }
+      return { success: true, message: 'Verification code sent successfully via SMTP' }
     }
-    // Gmail 失败，尝试 Resend
-    console.log('Gmail failed, trying Resend...')
+    // SMTP 失败，尝试 Resend
+    console.log('SMTP failed, trying Resend...')
   }
 
   // 使用 Resend 作为备选

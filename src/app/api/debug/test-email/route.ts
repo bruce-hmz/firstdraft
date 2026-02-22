@@ -32,13 +32,23 @@ export async function GET(request: NextRequest) {
     const result = await sendVerificationEmail(email, testCode, 10)
 
     if (result.success) {
+      // 检测邮箱服务类型
+      let serviceType = 'Resend'
+      if (smtpUser) {
+        if (smtpUser.includes('@qq.com')) serviceType = 'QQ邮箱 SMTP'
+        else if (smtpUser.includes('@163.com')) serviceType = '163邮箱 SMTP'
+        else if (smtpUser.includes('@126.com')) serviceType = '126邮箱 SMTP'
+        else if (smtpUser.includes('@gmail.com')) serviceType = 'Gmail SMTP'
+        else serviceType = 'SMTP'
+      }
+
       return NextResponse.json({
         success: true,
         message: 'Email sent successfully!',
         details: {
           to: email,
           code: testCode,
-          service: smtpUser ? 'Gmail SMTP' : 'Resend',
+          service: serviceType,
           note: 'Check your inbox (and spam folder)'
         }
       })
@@ -47,7 +57,8 @@ export async function GET(request: NextRequest) {
         success: false,
         error: result.message,
         details: {
-          gmailConfigured: !!(smtpUser && smtpPass),
+          smtpConfigured: !!(smtpUser && smtpPass),
+          smtpUser: smtpUser || null,
           resendConfigured: !!resendApiKey
         }
       }, { status: 500 })
