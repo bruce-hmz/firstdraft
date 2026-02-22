@@ -8,8 +8,10 @@ import { useAppStore } from '@/stores/app-store';
 import { Copy, Check, RefreshCw, Download, Sparkles, Loader2, Save } from 'lucide-react';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from '@/lib/next-intl';
 
 export function ResultStep() {
+  const t = useTranslations();
   const {
     generationFlow: { result, shareUrl, idea, projectId },
     setResult,
@@ -62,13 +64,12 @@ export function ResultStep() {
         setTimeout(() => setCopied(false), 2000);
       } else {
         console.error('✗ Failed to save page:', data.error);
-        const errorMsg = data.error?.message || '未知错误';
-        const errorDetails = data.error?.details ? '\n\n详细信息: ' + data.error.details : '';
-        alert('保存失败: ' + errorMsg + errorDetails + '\n\n请检查浏览器控制台(F12)查看详细日志');
+        const errorMsg = data.error?.message || t('errors.saveError');
+        alert(t('errors.saveError') + ': ' + errorMsg);
       }
     } catch (error) {
       console.error('✗ Exception during save:', error);
-      alert('保存失败: ' + error);
+      alert(t('errors.saveError') + ': ' + error);
     } finally {
       setSaving(false);
     }
@@ -90,13 +91,13 @@ export function ResultStep() {
         className="flex justify-between items-center"
       >
         <div>
-          <h2 className="text-2xl font-bold text-neutral-900">你的产品页面已生成</h2>
-          <p className="text-neutral-500 mt-1">预览效果并分享给他人</p>
+          <h2 className="text-2xl font-bold text-neutral-900">{t('result.title')}</h2>
+          <p className="text-neutral-500 mt-1">{t('result.description')}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" onClick={resetFlow}>
             <RefreshCw className="mr-2 h-4 w-4" />
-            重新开始
+            {t('result.restart')}
           </Button>
           <Button
             onClick={currentShareUrl ? handleCopy : handleSaveAndShare}
@@ -106,22 +107,22 @@ export function ResultStep() {
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                保存中...
+                {t('result.saving')}
               </>
             ) : copied ? (
               <>
                 <Check className="mr-2 h-4 w-4" />
-                已复制
+                {t('common.copied')}
               </>
             ) : currentShareUrl ? (
               <>
                 <Copy className="mr-2 h-4 w-4" />
-                复制链接
+                {t('result.copyLink')}
               </>
             ) : (
               <>
                 <Save className="mr-2 h-4 w-4" />
-                保存并分享
+                {t('result.saveAndShare')}
               </>
             )}
           </Button>
@@ -137,7 +138,7 @@ export function ResultStep() {
           <div className="bg-neutral-900 text-white p-12 text-center">
             <Badge variant="secondary" className="mb-4 bg-white/10 text-white border-0">
               <Sparkles className="h-3 w-3 mr-1" />
-              新产品
+              {t('result.newProduct')}
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">{result.productName}</h1>
             <p className="text-xl text-neutral-300 mb-2">{result.tagline}</p>
@@ -194,7 +195,7 @@ export function ResultStep() {
 
           <div className="bg-neutral-50 p-4 text-center border-t border-neutral-100">
             <p className="text-sm text-neutral-400">
-              由 FirstDraft 生成
+              {t('result.generatedBy')}
             </p>
           </div>
         </Card>
@@ -210,7 +211,7 @@ export function ResultStep() {
           <Link href={currentShareUrl} target="_blank">
             <Button variant="outline" className="gap-2">
               <Sparkles className="h-4 w-4" />
-              预览分享页面
+              {t('result.previewShare')}
             </Button>
           </Link>
         </motion.div>

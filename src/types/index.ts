@@ -28,6 +28,7 @@ export interface GeneratePageRequest {
   idea: string;
   answers: Record<string, string>;
   anonymousId?: string;
+  language?: 'zh-CN' | 'en';
 }
 
 export interface GeneratePageResponse {

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowRight, ArrowLeft, Loader2, SkipForward, Sparkles, Check } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Question {
   id: string;
@@ -82,11 +83,12 @@ export function QuestionsStep() {
   } = useAppStore();
 
   const { checkPaywall, deductCredit } = useBilling();
+  const { locale } = useLanguage();
   const [showPaywall, setShowPaywall] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizeStatus, setOptimizeStatus] = useState<'idle' | 'loading' | 'success' | 'timeout'>('idle');
-  
+
   const currentQuestion = questions[currentIndex];
 
   useEffect(() => {
@@ -180,6 +182,7 @@ export function QuestionsStep() {
         body: JSON.stringify({
           idea,
           answers,
+          language: locale,
         }),
       });
 

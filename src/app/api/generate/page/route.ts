@@ -49,7 +49,7 @@ async function getAIClient() {
 export async function POST(request: NextRequest) {
   try {
     const body: GeneratePageRequest = await request.json()
-    const { idea, answers } = body
+    const { idea, answers, language = 'zh-CN' } = body
 
     if (!idea || idea.trim().length < 5) {
       return NextResponse.json(
@@ -78,12 +78,16 @@ export async function POST(request: NextRequest) {
     }
 
     const client = await getAIClient()
-    const prompt = generatePagePrompt(idea, answers)
+    const prompt = generatePagePrompt(idea, answers, language)
+
+    const systemPrompt = language === 'zh-CN'
+      ? '你是一个专业的产品文案撰写专家和着陆页设计师。'
+      : 'You are a professional product copywriter and landing page designer.';
 
     const content = await client.chatCompletion([
       {
         role: 'system',
-        content: '你是一个专业的产品文案撰写专家和着陆页设计师。',
+        content: systemPrompt,
       },
       {
         role: 'user',

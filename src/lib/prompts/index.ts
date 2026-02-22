@@ -41,8 +41,13 @@ export const generateQuestionsPrompt = (idea: string) => `
 
 export const generatePagePrompt = (
   idea: string,
-  answers: Record<string, string>
-) => `
+  answers: Record<string, string>,
+  language: 'zh-CN' | 'en' = 'zh-CN'
+) => {
+  const isChinese = language === 'zh-CN';
+
+  if (isChinese) {
+    return `
 你是一个专业的产品文案撰写专家和着陆页设计师。根据用户提供的产品想法和回答，生成一个完整的单页产品页面内容。
 
 用户的产品想法："""${idea}"""
@@ -101,6 +106,68 @@ ${Object.entries(answers).map(([key, value]) => `- ${key}: ${value}`).join('\n')
 - 避免过度营销词汇，真诚表达
 - 返回纯JSON，不要其他文字
 `;
+  } else {
+    return `
+You are a professional product copywriter and landing page designer. Based on the user's product idea and responses, generate a complete single-page product page content.
+
+User's product idea: """${idea}"""
+
+User's responses:
+${Object.entries(answers).map(([key, value]) => `- ${key}: ${value}`).join('\n')}
+
+Generate landing page copy with the following requirements:
+1. Product name: Concise, memorable, and distinctive (2-3 words ideal)
+2. Tagline: Clear value proposition, no more than 10 words
+3. Problem description: Empathize with target users' pain points, describe specific scenarios
+4. Solution: Highlight core features with 3 key characteristics
+5. CTA: Call-to-action button copy
+
+Return in the following JSON format (do not include markdown code blocks):
+
+{
+  "productName": "Product Name",
+  "tagline": "One-line introduction",
+  "description": "Brief description, under 20 words",
+  "problemSection": {
+    "headline": "Pain point headline that resonates",
+    "description": "Detailed pain point description, under 50 words, use scenario-based language",
+    "painPoints": ["Pain point 1", "Pain point 2", "Pain point 3"]
+  },
+  "solutionSection": {
+    "headline": "Solution headline",
+    "description": "Solution overview, under 20 words",
+    "features": [
+      {
+        "title": "Feature 1 title",
+        "description": "Feature 1 description",
+        "icon": "Related emoji"
+      },
+      {
+        "title": "Feature 2 title",
+        "description": "Feature 2 description",
+        "icon": "Related emoji"
+      },
+      {
+        "title": "Feature 3 title",
+        "description": "Feature 3 description",
+        "icon": "Related emoji"
+      }
+    ]
+  },
+  "ctaSection": {
+    "text": "Get Started",
+    "subtext": "No credit card required, start now"
+  }
+}
+
+Requirements:
+- Writing style: Professional but approachable, warm
+- Use English, conform to English context and idioms
+- Avoid overly promotional language, express sincerely
+- Return pure JSON, no other text
+`;
+  }
+};
 
 export function parseAIResponse<T>(content: string): T {
   try {
