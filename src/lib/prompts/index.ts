@@ -48,123 +48,247 @@ export const generatePagePrompt = (
 
   if (isChinese) {
     return `
-你是一个专业的产品文案撰写专家和着陆页设计师。根据用户提供的产品想法和回答，生成一个完整的单页产品页面内容。
+你是一名擅长情感化文案的落地页专家。
+你的任务不是"写一个产品介绍"，而是**让看到页面的人产生"这正是我需要的"的强烈感受**。
 
-用户的产品想法："""${idea}"""
+---
 
-用户的回答：
+## 用户的产品想法
+"""${idea}"""
+
+## 用户的回答（帮助理解目标用户和痛点）
 ${Object.entries(answers).map(([key, value]) => `- ${key}: ${value}`).join('\n')}
 
-请生成以下内容的着陆页文案，要求：
-1. 产品名称：简洁、易记、有辨识度（2-3个字最佳）
-2. 一句话介绍：价值主张清晰，不超过15个字
-3. 问题描述：共情目标用户的痛点，描述具体场景
-4. 解决方案：突出核心功能，用3个特性展示
-5. CTA：行动号召按钮文案
+---
 
-请用以下JSON格式返回（不要包含markdown代码块标记）：
+## 核心原则（违反任何一条 = 失败）
+
+1. **痛点必须场景化**：不要写"照片管理困难"，要写"当你在深夜打开手机想找那张珍贵的照片，翻了几百张却怎么也找不到..."
+2. **解决方案写用户价值**：不要写"支持云存储"，要写"你的回忆永远安全，换个手机也不会丢"
+3. **每个功能都是情感链接**：功能不是冷冰冰的特性，而是"解决某个具体焦虑的答案"
+4. **CTA 要有情绪钩子**：不是"立即使用"，而是"现在就去留住那些值得记住的瞬间"
+
+---
+
+## 生成内容要求
+
+### 1. productName（产品名）
+- 2-4 个字
+- 好记、有温度、暗示功能
+- ❌ "智能照片管理系统" 
+- ✅ "拾光" / "印记"
+
+### 2. tagline（一句话定位）
+- 不是产品介绍，而是**对用户的情感承诺**
+- 15 字以内
+- ❌ "帮助你整理照片的 AI 工具"
+- ✅ "让回忆不再散落各处"
+
+### 3. description（简短描述）
+- 50 字以内
+- 补充 tagline，说出用户最关心的那个"结果"
+
+### 4. problemSection（痛点区）
+
+**headline**：一句话戳中用户内心的标题
+- ❌ "你是否面临这些困扰"
+- ✅ "那些让你深夜失眠的瞬间"
+
+**description**：用**第一人称视角**描述一个具体场景
+- 必须包含：时间/地点 + 动作 + 挫败感
+- 示例："当孩子突然问起'妈妈我小时候是什么样子'，你打开相册却发现照片散落在微信、iCloud、旧手机各处..."
+
+**painPoints**：3 个痛点，每个痛点用"场景+情绪"结构
+- ❌ "照片太多难以管理"
+- ✅ "翻了一小时，找不到那张毕业合影"
+
+### 5. solutionSection（解决方案区）
+
+**headline**：让用户产生"原来可以这样"的期待
+- ❌ "我们的解决方案"
+- ✅ "现在，你可以这样守护回忆"
+
+**description**：一句话说出核心价值，暗示"低门槛"
+- 示例："几秒钟就能整理好，不用学习，立刻就能看到效果"
+
+**features**：3 个功能，每个功能必须包含：
+- **title**：用"动词+结果"命名
+- **description**：强调用户受益，不是技术实现
+- **icon**：选择能传递情感的 emoji
+
+功能描述公式：
+- ❌ "支持 AI 智能分类"
+- ✅ "它会自动帮你把照片按人物、地点、时间整理好，你只需要享受翻看的乐趣"
+
+### 6. ctaSection（行动召唤区）
+
+**text**：带情绪的主按钮文案
+- ❌ "开始使用"
+- ✅ "现在就去留住那些值得记住的瞬间"
+
+**subtext**：降低门槛的副文案
+- ❌ "无需信用卡"
+- ✅ "30 秒就能看到你的第一个整理结果"
+
+---
+
+## 输出格式（纯 JSON，不要 markdown 代码块）
 
 {
-  "productName": "产品名称",
-  "tagline": "一句话介绍",
-  "description": "简短描述，50字以内",
+  "productName": "...",
+  "tagline": "...",
+  "description": "...",
   "problemSection": {
-    "headline": "痛点标题，引发共鸣",
-    "description": "痛点详细描述，100字以内，用场景化语言",
-    "painPoints": ["痛点1", "痛点2", "痛点3"]
+    "headline": "...",
+    "description": "...",
+    "painPoints": ["...", "...", "..."]
   },
   "solutionSection": {
-    "headline": "解决方案标题",
-    "description": "解决方案概述，50字以内",
+    "headline": "...",
+    "description": "...",
     "features": [
-      {
-        "title": "功能1标题",
-        "description": "功能1描述",
-        "icon": "相关emoji"
-      },
-      {
-        "title": "功能2标题",
-        "description": "功能2描述",
-        "icon": "相关emoji"
-      },
-      {
-        "title": "功能3标题",
-        "description": "功能3描述",
-        "icon": "相关emoji"
-      }
+      { "title": "...", "description": "...", "icon": "..." },
+      { "title": "...", "description": "...", "icon": "..." },
+      { "title": "...", "description": "...", "icon": "..." }
     ]
   },
   "ctaSection": {
-    "text": "开始使用",
-    "subtext": "无需信用卡，立即体验"
+    "text": "...",
+    "subtext": "..."
   }
 }
 
-要求：
-- 文案风格：专业但不生硬，有温度
-- 使用中文，符合中文语境
-- 避免过度营销词汇，真诚表达
-- 返回纯JSON，不要其他文字
+---
+
+## 最后检查清单
+
+生成完成后，请自检：
+- [ ] 痛点区是否让人产生"就是我"的感觉？
+- [ ] 功能描述是否强调用户受益而非技术？
+- [ ] CTA 是否有情感钩子让人想点击？
+- [ ] 每句话是否都值得被阅读（没有废话）？
 `;
   } else {
     return `
-You are a professional product copywriter and landing page designer. Based on the user's product idea and responses, generate a complete single-page product page content.
+You are a landing page expert specializing in emotional, conversion-focused copy.
+Your task is not to "write a product description" but to **make visitors feel "this is exactly what I need"**.
 
-User's product idea: """${idea}"""
+---
 
-User's responses:
+## User's Product Idea
+"""${idea}"""
+
+## User's Responses (helps understand target users and pain points)
 ${Object.entries(answers).map(([key, value]) => `- ${key}: ${value}`).join('\n')}
 
-Generate landing page copy with the following requirements:
-1. Product name: Concise, memorable, and distinctive (2-3 words ideal)
-2. Tagline: Clear value proposition, no more than 10 words
-3. Problem description: Empathize with target users' pain points, describe specific scenarios
-4. Solution: Highlight core features with 3 key characteristics
-5. CTA: Call-to-action button copy
+---
 
-Return in the following JSON format (do not include markdown code blocks):
+## Core Principles (violating any = failure)
+
+1. **Pain points must be scenario-based**: Don't write "photo management is difficult", write "When you're scrolling through your phone at midnight trying to find that precious photo, swiping through hundreds but just can't find it..."
+2. **Solutions describe user value**: Don't write "supports cloud storage", write "Your memories are safe forever, even if you change phones"
+3. **Every feature is an emotional link**: Features aren't cold specs, they're "answers to specific anxieties"
+4. **CTA has emotional hooks**: Not "Get Started", but "Start preserving the moments worth remembering"
+
+---
+
+## Content Requirements
+
+### 1. productName
+- 1-2 words
+- Memorable, warm, hints at function
+- ❌ "Smart Photo Management System"
+- ✅ "Keepsake" / "Cherish"
+
+### 2. tagline
+- Not a product intro, but an **emotional promise to the user**
+- Under 10 words
+- ❌ "AI tool to help organize your photos"
+- ✅ "Keep memories from scattering everywhere"
+
+### 3. description
+- Under 50 characters
+- Complements tagline, states the "result" users care about most
+
+### 4. problemSection
+
+**headline**: A title that hits users right in the heart
+- ❌ "Do you face these problems"
+- ✅ "Those moments that keep you up at night"
+
+**description**: Describe a specific scenario in **first-person perspective**
+- Must include: time/place + action + frustration
+- Example: "When your child suddenly asks 'Mom, what was I like when I was little?' You open your gallery only to find photos scattered across WeChat, iCloud, old phones..."
+
+**painPoints**: 3 pain points, each using "scenario + emotion" structure
+- ❌ "Too many photos to manage"
+- ✅ "Spent an hour scrolling, still can't find that graduation photo"
+
+### 5. solutionSection
+
+**headline**: Creates anticipation of "I can do it this way"
+- ❌ "Our Solution"
+- ✅ "Now you can protect memories like this"
+
+**description**: One sentence stating core value, hints at "low barrier"
+- Example: "Organized in seconds, no learning curve, see results immediately"
+
+**features**: 3 features, each must include:
+- **title**: Named with "verb + result"
+- **description**: Emphasize user benefit, not technical implementation
+- **icon**: Choose an emoji that conveys emotion
+
+Feature description formula:
+- ❌ "Supports AI smart categorization"
+- ✅ "It automatically organizes your photos by people, places, and time—you just enjoy browsing"
+
+### 6. ctaSection
+
+**text**: CTA with emotional trigger
+- ❌ "Get Started"
+- ✅ "Start preserving the moments worth remembering"
+
+**subtext**: Barrier-lowering subtext
+- ❌ "No credit card required"
+- ✅ "See your first organized collection in 30 seconds"
+
+---
+
+## Output Format (pure JSON, no markdown code blocks)
 
 {
-  "productName": "Product Name",
-  "tagline": "One-line introduction",
-  "description": "Brief description, under 20 words",
+  "productName": "...",
+  "tagline": "...",
+  "description": "...",
   "problemSection": {
-    "headline": "Pain point headline that resonates",
-    "description": "Detailed pain point description, under 50 words, use scenario-based language",
-    "painPoints": ["Pain point 1", "Pain point 2", "Pain point 3"]
+    "headline": "...",
+    "description": "...",
+    "painPoints": ["...", "...", "..."]
   },
   "solutionSection": {
-    "headline": "Solution headline",
-    "description": "Solution overview, under 20 words",
+    "headline": "...",
+    "description": "...",
     "features": [
-      {
-        "title": "Feature 1 title",
-        "description": "Feature 1 description",
-        "icon": "Related emoji"
-      },
-      {
-        "title": "Feature 2 title",
-        "description": "Feature 2 description",
-        "icon": "Related emoji"
-      },
-      {
-        "title": "Feature 3 title",
-        "description": "Feature 3 description",
-        "icon": "Related emoji"
-      }
+      { "title": "...", "description": "...", "icon": "..." },
+      { "title": "...", "description": "...", "icon": "..." },
+      { "title": "...", "description": "...", "icon": "..." }
     ]
   },
   "ctaSection": {
-    "text": "Get Started",
-    "subtext": "No credit card required, start now"
+    "text": "...",
+    "subtext": "..."
   }
 }
 
-Requirements:
-- Writing style: Professional but approachable, warm
-- Use English, conform to English context and idioms
-- Avoid overly promotional language, express sincerely
-- Return pure JSON, no other text
+---
+
+## Final Checklist
+
+After generating, please self-check:
+- [ ] Does the pain point section make people feel "that's me"?
+- [ ] Do feature descriptions emphasize user benefits, not technology?
+- [ ] Does the CTA have emotional hooks that make people want to click?
+- [ ] Is every sentence worth reading (no fluff)?
 `;
   }
 };
