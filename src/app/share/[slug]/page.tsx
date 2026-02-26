@@ -161,7 +161,7 @@ export default function SharePage({ params }: SharePageProps) {
               {t('result.newProduct')}
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">{content.productName}</h1>
-            <p className="text-xl text-neutral-300 mb-2">{content.tagline}</p>
+            <p className="text-xl text-neutral-300 mb-2 whitespace-pre-line">{content.tagline}</p>
             <p className="text-neutral-400 max-w-lg mx-auto">{content.description}</p>
           </div>
 
