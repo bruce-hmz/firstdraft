@@ -69,8 +69,7 @@ export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
 
     try {
       setIdea(idea.trim())
-      setGenerationStep('questions')
-      router.push('/generate')
+      router.push('/template')
     } catch (error) {
       console.error('Failed to start generation:', error)
     } finally {

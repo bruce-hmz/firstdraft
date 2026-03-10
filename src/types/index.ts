@@ -29,6 +29,10 @@ export interface GeneratePageRequest {
   answers: Record<string, string>;
   anonymousId?: string;
   language?: 'zh-CN' | 'en';
+  metadata?: {
+    template?: string;
+    [key: string]: unknown;
+  };
 }
 
 export interface GeneratePageResponse {

@@ -73,7 +73,7 @@ function getQuestionsForIdea(t: (key: string) => string, idea: string): Question
 export function QuestionsStep() {
   const t = useTranslations();
   const {
-    generationFlow: { questions, answers, isLoading, idea },
+    generationFlow: { questions, answers, isLoading, idea, template },
     setAnswer,
     setQuestions,
     setGenerationStep,
@@ -183,6 +183,9 @@ export function QuestionsStep() {
           idea,
           answers,
           language: locale,
+          metadata: {
+            template,
+          },
         }),
       });
 
