@@ -12,6 +12,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslations } from '@/lib/next-intl';
 import type { PageContent } from '@/types';
+import { analytics } from '@/lib/analytics';
 
 export function ResultStep() {
   const t = useTranslations();
@@ -62,6 +63,9 @@ export function ResultStep() {
         console.log('✓ Share URL generated:', newShareUrl);
         setCurrentShareUrl(newShareUrl);
         setResult(result, data.data.slug, newShareUrl);
+
+        // Track page shared
+        analytics.pageShared(data.data.slug);
 
         await navigator.clipboard.writeText(newShareUrl);
         setCopied(true);

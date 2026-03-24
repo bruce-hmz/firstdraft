@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowRight, ArrowLeft, Loader2, SkipForward, Sparkles, Check } from 'lucide-react';
 import { useLanguage } from '@/hooks/use-language';
+import { analytics } from '@/lib/analytics';
 
 interface Question {
   id: string;
@@ -165,6 +166,10 @@ export function QuestionsStep() {
     setError(null);
     setGenerationStep('generating');
 
+    // Track generation started
+    const startTime = Date.now();
+    analytics.generationStarted(idea.length);
+
     try {
       const deductSuccess = await deductCredit();
       if (!deductSuccess) {
@@ -194,6 +199,10 @@ export function QuestionsStep() {
       if (!data.success) {
         throw new Error(data.error?.message || t('errors.generateError'));
       }
+
+      // Track generation completed
+      const duration = Date.now() - startTime;
+      analytics.generationCompleted(duration);
 
       setResult(data.data.page, '', '');
       setGenerationStep('result');

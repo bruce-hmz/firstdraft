@@ -16,6 +16,21 @@ We follow [Semantic Versioning](https://semver.org/):
 
 ---
 
+## [0.1.0.1] - 2026-03-24
+
+### Added
+- PostHog analytics integration for user behavior tracking
+- First-time user detection via localStorage
+- Anonymous user identification for pre-login analytics
+- Floating feedback button for user feedback collection
+- Feedback API endpoint (logs to console for validation phase)
+- Analytics events: idea_submitted, generation_started, generation_completed, page_shared, feedback_submitted
+
+### Changed
+- Updated Stripe API version to 2026-02-25.clover
+
+---
+
 ## [0.1.0] - 2025-02-05
 
 ### Added
@@ -57,6 +72,6 @@ When upgrading from 0.1.x to 1.0.0:
 
 ---
 
-**Current Version: 0.1.0**
+**Current Version: 0.1.0.1**
 
 For more information, visit: https://github.com/yourusername/firstdraft

@@ -3,6 +3,8 @@ import { NextIntlClientProvider } from 'next-intl';
 import { TranslationsProvider } from '@/lib/use-translations';
 import { COOKIE_NAME, defaultLocale, locales, type Locale } from '@/i18n/config';
 import { cookies } from 'next/headers';
+import { AnalyticsProvider } from '@/components/analytics-provider';
+import { FeedbackButton } from '@/components/feedback-button';
 import "./globals.css";
 
 // 强制动态渲染，改善水合问题
@@ -40,9 +42,12 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className="font-sans antialiased">
-        <TranslationsProvider locale={locale}>
-          {children}
-        </TranslationsProvider>
+        <AnalyticsProvider>
+          <TranslationsProvider locale={locale}>
+            {children}
+          </TranslationsProvider>
+          <FeedbackButton />
+        </AnalyticsProvider>
       </body>
     </html>
   );
