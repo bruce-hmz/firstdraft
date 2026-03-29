@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { Sparkles, ArrowRight, LogIn } from 'lucide-react'
 import { useAppStore } from '@/stores/app-store'
+import { analytics } from '@/lib/analytics'
 
 interface IdeaInputSectionProps {
   initialIdea?: string
@@ -68,9 +69,11 @@ export function IdeaInputSection({ initialIdea = '' }: IdeaInputSectionProps) {
     setIsGenerating(true)
 
     try {
+      // Track idea submission
+      analytics.ideaSubmitted(idea.trim().length)
+
       setIdea(idea.trim())
-      setGenerationStep('questions')
-      router.push('/generate')
+      router.push('/template')
     } catch (error) {
       console.error('Failed to start generation:', error)
     } finally {

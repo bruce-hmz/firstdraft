@@ -1,6 +1,6 @@
 {
   "name": "firstdraft",
-  "version": "0.1.0",
+  "version": "0.1.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -21,6 +21,7 @@
     "nanoid": "^5.1.6",
     "next": "16.1.6",
     "next-intl": "^4.8.3",
+    "posthog-js": "^1.363.2",
     "nodemailer": "^8.0.1",
     "openai": "^6.17.0",
     "radix-ui": "^1.4.3",

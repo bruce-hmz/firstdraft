@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { nanoid } from 'nanoid'
 import { generatePagePrompt, parseAIResponse } from '@/lib/prompts'
 import { createAdminClient } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase/server'
 import { createAIClient } from '@/lib/models/client'
 import { GeneratePageRequest, PageContent } from '@/types'
 
@@ -48,8 +49,8 @@ async function getAIClient() {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: GeneratePageRequest = await request.json()
-    const { idea, answers, language = 'zh-CN' } = body
+    const body: GeneratePageRequest & { metadata?: { template?: string } } = await request.json()
+    const { idea, answers, language = 'zh-CN', metadata } = body
 
     if (!idea || idea.trim().length < 5) {
       return NextResponse.json(
@@ -75,6 +76,38 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       )
+    }
+
+    // 检查用户登录和额度
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { success: false, error: { code: 'UNAUTHORIZED', message: '请先登录' } },
+        { status: 401 }
+      );
+    }
+
+    // 检查额度
+    const { data: success, error: deductError } = await supabase.rpc('deduct_credits', {
+      user_id: user.id,
+      amount: 1,
+    });
+
+    if (deductError) {
+      console.error('Deduct credits error:', deductError);
+      return NextResponse.json(
+        { success: false, error: { code: 'DEDUCT_FAILED', message: '额度扣减失败: ' + deductError.message } },
+        { status: 500 }
+      );
+    }
+
+    if (!success) {
+      return NextResponse.json(
+        { success: false, error: { code: 'INSUFFICIENT_CREDITS', message: '额度不足，请充值后继续' } },
+        { status: 400 }
+      );
     }
 
     const client = await getAIClient()
@@ -108,7 +141,6 @@ export async function POST(request: NextRequest) {
       success: true,
       data: {
         page: pageContent,
-        isPro: false,
       },
     })
   } catch (error) {

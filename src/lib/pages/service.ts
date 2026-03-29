@@ -32,6 +32,7 @@ export async function createPage(input: CreatePageInput & { userId?: string; ano
     slug,
     title: input.title,
     content: input.content,
+    template: input.metadata?.template || 'default',
     metadata: input.metadata || {},
     user_id: input.userId || null,
     anonymous_id: input.anonymousId || null,

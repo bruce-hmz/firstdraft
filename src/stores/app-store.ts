@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type GenerationStep = 'input' | 'questions' | 'generating' | 'result';
+export type GenerationStep = 'input' | 'template' | 'questions' | 'generating' | 'result';
 
 export interface Question {
   id: string;
@@ -38,6 +38,7 @@ interface AppState {
   generationFlow: {
     step: GenerationStep;
     idea: string;
+    template?: string;
     questions: Question[];
     answers: Record<string, string>;
     result: PageContent | null;
@@ -48,6 +49,7 @@ interface AppState {
   };
   setGenerationStep: (step: GenerationStep) => void;
   setIdea: (idea: string) => void;
+  setTemplate: (template: string) => void;
   setQuestions: (questions: Question[]) => void;
   setAnswer: (id: string, value: string) => void;
   setAnswers: (answers: Record<string, string>) => void;
@@ -74,6 +76,7 @@ export interface User {
 const initialFlowState = {
   step: 'input' as GenerationStep,
   idea: '',
+  template: 'default',
   questions: [],
   answers: {},
   result: null,
@@ -105,6 +108,14 @@ export const useAppStore = create<AppState>()(
             projectId: null,
             shareUrl: null,
             error: null,
+          } 
+        })),
+      
+      setTemplate: (template) => 
+        set((state) => ({ 
+          generationFlow: { 
+            ...state.generationFlow, 
+            template
           } 
         })),
       
