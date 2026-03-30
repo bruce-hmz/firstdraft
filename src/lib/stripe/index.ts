@@ -10,7 +10,7 @@ function getStripe(): Stripe {
       throw new Error('STRIPE_SECRET_KEY is not configured')
     }
     stripeInstance = new Stripe(secretKey, {
-      apiVersion: '2026-02-25.clover',
+      apiVersion: '2026-01-28.clover',
     })
   }
   return stripeInstance
