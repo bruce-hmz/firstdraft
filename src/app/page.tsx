@@ -16,70 +16,70 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const quickTags = [
-    { icon: Sparkles, text: 'AI 驱动' },
-    { icon: Clock, text: '3分钟完成' },
-    { icon: Globe, text: '中英双语' },
-    { icon: Users, text: '无需登录试用' },
+    { icon: Sparkles, text: 'AI ' + t('home.feature1Title').split('，')[0] },
+    { icon: Clock, text: '3min' },
+    { icon: Globe, text: 'EN / 中文' },
+    { icon: Users, text: t('auth.noAccount').split('?')[0] },
   ];
 
   const keyFeatures = [
     {
       icon: Zap,
-      title: '闪电般的速度',
-      description: '从想法到完整的产品页面，只需要3分钟。AI 帮你处理繁琐的文案工作。',
+      title: t('home.feature1Title').split('。')[0],
+      description: t('home.feature1Description'),
     },
     {
       icon: Wand2,
-      title: '智能理解',
-      description: '不用绞尽脑汁组织语言。AI 帮你把心里话说得漂亮，理解你的欲言又止。',
+      title: t('home.feature2Title').split('。')[0],
+      description: t('home.feature2Description'),
     },
     {
       icon: Share2,
-      title: '一键分享',
-      description: '一个链接就够了。发给朋友、投资人，或者那个一直支持你的家人。',
+      title: t('home.feature3Title').split('。')[0],
+      description: t('home.feature3Description'),
     },
   ];
 
   const stats = [
-    { value: '10K+', label: '想法已生成' },
-    { value: '3min', label: '平均生成时间' },
-    { value: '98%', label: '用户满意度' },
+    { value: t('home.stats.value.10k'), label: t('home.stats.ideasGenerated') },
+    { value: t('home.stats.value.3min'), label: t('home.stats.avgGenerationTime') },
+    { value: t('home.stats.value.98'), label: t('home.stats.userSatisfaction') },
   ];
 
   const testimonials = [
     {
-      quote: '终于有个工具能快速把我的想法具象化了，不用再花几天时间写文案。',
-      author: '独立开发者',
-      avatar: '👨‍💻',
+      quote: t('home.testimonials.items.0.quote'),
+      author: t('home.testimonials.items.0.author'),
+      avatar: t('home.testimonials.items.0.avatar'),
     },
     {
-      quote: '作为一个产品经理，这个工具帮我快速验证了很多产品想法。',
-      author: '产品经理',
-      avatar: '👩‍💼',
+      quote: t('home.testimonials.items.1.quote'),
+      author: t('home.testimonials.items.1.author'),
+      avatar: t('home.testimonials.items.1.avatar'),
     },
     {
-      quote: '分享给投资人的时候，他们都很惊讶这么快就能看到完整的页面。',
-      author: '创业者',
-      avatar: '🚀',
+      quote: t('home.testimonials.items.2.quote'),
+      author: t('home.testimonials.items.2.author'),
+      avatar: t('home.testimonials.items.2.avatar'),
     },
   ];
 
   const faqs = [
     {
-      question: 'FirstDraft 是什么？',
-      answer: 'FirstDraft 是一个 AI 驱动的产品页面生成器。只需要用几句话描述你的想法，AI 就会帮你生成一个完整、专业的产品展示页面。',
+      question: t('home.faq.items.0.question'),
+      answer: t('home.faq.items.0.answer'),
     },
     {
-      question: '真的免费吗？',
-      answer: '是的！新用户可以获得免费试用额度。我们相信每个人都应该有机会把想法变成现实。',
+      question: t('home.faq.items.1.question'),
+      answer: t('home.faq.items.1.answer'),
     },
     {
-      question: '需要设计经验吗？',
-      answer: '完全不需要。我们的 AI 会处理所有的设计和文案工作。你只需要专注于你的想法本身。',
+      question: t('home.faq.items.2.question'),
+      answer: t('home.faq.items.2.answer'),
     },
     {
-      question: '生成的页面可以分享吗？',
-      answer: '当然可以！每个生成的页面都有独立的链接，你可以分享给任何人——朋友、投资人、潜在用户。',
+      question: t('home.faq.items.3.question'),
+      answer: t('home.faq.items.3.answer'),
     },
   ];
 
@@ -152,10 +152,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto relative">
           <div className="text-center mb-8">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-              寻找灵感
+              {t('home.exampleTitle')}
             </h2>
             <p className="text-muted-foreground">
-              看看其他人在创造什么，或者选择一个示例开始
+              {t('home.exampleDescription')}
             </p>
           </div>
           <ExampleIdeas onSelectIdea={setSelectedIdea} />
@@ -174,7 +174,7 @@ export default function Home() {
               {t('home.feature1Title').split('。')[0]}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              我们帮你把模糊的想法，变成清晰的产品展示
+              {t('home.feature1Description')}
             </p>
           </div>
 
@@ -206,7 +206,7 @@ export default function Home() {
         <div className="max-w-4xl mx-auto relative">
           <div className="text-center mb-8">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-              被创作者信赖
+              {t('home.stats.title')}
             </h2>
           </div>
 
@@ -233,10 +233,10 @@ export default function Home() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-              用户怎么说
+              {t('home.testimonials.title')}
             </h2>
             <p className="text-muted-foreground">
-              看看创作者们如何使用 FirstDraft
+              {t('home.testimonials.subtitle')}
             </p>
           </div>
 
@@ -264,7 +264,7 @@ export default function Home() {
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-              常见问题
+              {t('home.faq.title')}
             </h2>
           </div>
 
@@ -297,10 +297,10 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto text-center relative">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">
-            准备好让你的想法见人了么？
+            {t('home.cta.title')}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            只需要3分钟，给你的想法一个专业的开始
+            {t('home.cta.subtitle')}
           </p>
           <Button
             size="lg"
@@ -308,7 +308,7 @@ export default function Home() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             <Sparkles className="h-5 w-5" />
-            立即开始
+            {t('home.cta.button') || (t('home.cta.title').includes('Ready') ? 'Get Started' : '立即开始')}
             <ArrowRight className="h-5 w-5" />
           </Button>
         </div>

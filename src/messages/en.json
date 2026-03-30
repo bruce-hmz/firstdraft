@@ -87,7 +87,65 @@
     "feature2Description": "No need to rack your brain for words. AI helps you express yourself beautifully",
     "feature3Title": "Show the world your ambition",
     "feature3Description": "One link is enough. Send it to friends, investors, or the family who always supports you",
-    "footer": "© 2024 FirstDraft. Turn your first idea into something real."
+    "footer": "© 2024 FirstDraft. Turn your first idea into something real.",
+    "stats": {
+      "title": "Trusted by creators",
+      "ideasGenerated": "Ideas Generated",
+      "avgGenerationTime": "Avg Generation Time",
+      "userSatisfaction": "User Satisfaction",
+      "value": {
+        "10k": "10K+",
+        "3min": "3min",
+        "98": "98%"
+      }
+    },
+    "testimonials": {
+      "title": "What creators are saying",
+      "subtitle": "See how creators use FirstDraft",
+      "items": [
+        {
+          "quote": "Finally a tool that helps me quickly visualize my ideas without spending days writing copy.",
+          "author": "Indie Developer",
+          "avatar": "👨‍💻"
+        },
+        {
+          "quote": "As a product manager, this tool helped me quickly validate many product ideas.",
+          "author": "Product Manager",
+          "avatar": "👩‍💼"
+        },
+        {
+          "quote": "When I shared it with investors, they were all surprised to see a complete page so quickly.",
+          "author": "Entrepreneur",
+          "avatar": "🚀"
+        }
+      ]
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        {
+          "question": "What is FirstDraft?",
+          "answer": "FirstDraft is an AI-powered product page generator. Just describe your idea in a few sentences, and AI will create a complete, professional product landing page for you."
+        },
+        {
+          "question": "Is it really free?",
+          "answer": "Yes! New users get free trial credits. We believe everyone should have the opportunity to turn their ideas into reality."
+        },
+        {
+          "question": "Do I need design experience?",
+          "answer": "Not at all. Our AI handles all the design and copywriting. You just need to focus on your idea itself."
+        },
+        {
+          "question": "Can I share the generated pages?",
+          "answer": "Absolutely! Each generated page has its own unique link that you can share with anyone — friends, investors, or potential users."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready to bring your idea to life?",
+      "subtitle": "Just 3 minutes to give your idea a professional start",
+      "button": "Get Started"
+    }
   },
   "generate": {
     "pageTitle": "Let's dive deeper into your idea",
