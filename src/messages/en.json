@@ -141,7 +141,7 @@
         }
       ]
     },
-    "cta": {
+    "bottomCta": {
       "title": "Ready to bring your idea to life?",
       "subtitle": "Just 3 minutes to give your idea a professional start",
       "button": "Get Started"

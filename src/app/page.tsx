@@ -297,10 +297,10 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto text-center relative">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">
-            {t('home.cta.title')}
+            {t('home.bottomCta.title')}
           </h2>
           <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto">
-            {t('home.cta.subtitle')}
+            {t('home.bottomCta.subtitle')}
           </p>
           <Button
             size="lg"
@@ -308,7 +308,7 @@ export default function Home() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
           >
             <Sparkles className="h-5 w-5" />
-            {t('home.cta.button') || (t('home.cta.title').includes('Ready') ? 'Get Started' : '立即开始')}
+            {t('home.bottomCta.button')}
             <ArrowRight className="h-5 w-5" />
           </Button>
         </div>
