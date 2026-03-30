@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Eye, Trash2, ExternalLink, Calendar } from 'lucide-react'
-import { formatDistanceToNow } from '@/lib/utils'
+import { formatDistanceToNow } from 'date-fns'
 import type { PageDbModel } from '@/types'
 
 interface DraftCardProps {
