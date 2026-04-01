@@ -72,8 +72,10 @@ export function ResultStep() {
         setTimeout(() => setCopied(false), 2000);
       } else {
         console.error('✗ Failed to save page:', data.error);
+        const status = response.status;
+        const errorCode = data.error?.code ? String(data.error.code) : 'UNKNOWN';
         const errorMsg = data.error?.message || t('errors.saveError');
-        alert(t('errors.saveError') + ': ' + errorMsg);
+        alert(`${t('errors.saveError')}: ${errorMsg} (status ${status}, code ${errorCode})`);
       }
     } catch (error) {
       console.error('✗ Exception during save:', error);

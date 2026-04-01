@@ -10,35 +10,23 @@ interface SavePageRequest {
   anonymousId?: string
 }
 
-async function parseJsonBody<T>(request: NextRequest): Promise<{ ok: true; value: T } | { ok: false; error: string }> {
-  try {
-    const text = await request.text()
-    if (!text) {
-      return { ok: false, error: 'EMPTY_BODY' }
-    }
-    return { ok: true, value: JSON.parse(text) as T }
-  } catch {
-    return { ok: false, error: 'INVALID_JSON' }
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const parsed = await parseJsonBody<SavePageRequest>(request)
-    if (!parsed.ok) {
+    let body: SavePageRequest
+    try {
+      body = (await request.json()) as SavePageRequest
+    } catch {
       return NextResponse.json(
         {
           success: false,
           error: {
-            code: parsed.error,
-            message: parsed.error === 'EMPTY_BODY' ? '请求体不能为空' : '请求体不是合法 JSON',
+            code: 'INVALID_JSON',
+            message: '请求体不是合法 JSON',
           },
         },
         { status: 400 }
       )
     }
-
-    const body = parsed.value
 
     if (!body.title || !body.content) {
       return NextResponse.json(
