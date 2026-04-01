@@ -9,27 +9,6 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, Smartphone, ShoppingCart, Layout } from 'lucide-react';
 import Link from 'next/link';
 
-const templates = [
-  {
-    id: 'default',
-    name: 'SaaS 产品模板',
-    description: '适合软件产品、SaaS服务，经典落地页布局',
-    icon: Layout,
-  },
-  {
-    id: 'mobile-app',
-    name: '移动应用模板',
-    description: '适合手机App，突出预览展示和应用商店下载',
-    icon: Smartphone,
-  },
-  {
-    id: 'physical-product',
-    name: '实体商品模板',
-    description: '适合实体产品，突出图片位置和购物体验',
-    icon: ShoppingCart,
-  },
-];
-
 export default function TemplateSelectPage() {
   const t = useTranslations();
   const router = useRouter();
@@ -39,6 +18,27 @@ export default function TemplateSelectPage() {
     router.push('/');
     return null;
   }
+
+  const templates = [
+    {
+      id: 'default',
+      name: t('templateSelect.templates.default.name'),
+      description: t('templateSelect.templates.default.description'),
+      icon: Layout,
+    },
+    {
+      id: 'mobile-app',
+      name: t('templateSelect.templates.mobileApp.name'),
+      description: t('templateSelect.templates.mobileApp.description'),
+      icon: Smartphone,
+    },
+    {
+      id: 'physical-product',
+      name: t('templateSelect.templates.physicalProduct.name'),
+      description: t('templateSelect.templates.physicalProduct.description'),
+      icon: ShoppingCart,
+    },
+  ];
 
   const handleSelect = (templateId: string) => {
     setTemplate(templateId);
@@ -51,14 +51,14 @@ export default function TemplateSelectPage() {
       <div className="max-w-4xl mx-auto px-6">
         <Link href="/" className="flex items-center gap-2 text-neutral-600 hover:text-neutral-900 mb-8">
           <ArrowLeft className="h-4 w-4" />
-          <span>重新输入想法</span>
+          <span>{t('templateSelect.backToIdea')}</span>
         </Link>
 
         <h1 className="text-3xl font-bold text-neutral-900 mb-2">
-          选择页面模板
+          {t('templateSelect.title')}
         </h1>
         <p className="text-neutral-600 mb-8">
-          为「{idea}」选择最适合的展示模板
+          {t('templateSelect.subtitle', { idea })}
         </p>
 
         <div className="grid md:grid-cols-3 gap-6">

@@ -3,6 +3,20 @@ import type { PageDbModel, CreatePageInput, PageContent } from '@/types'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+export type PageServiceErrorCode = 'CONFIG_MISSING' | 'DB_ERROR'
+
+export class PageServiceError extends Error {
+  code: PageServiceErrorCode
+  cause?: unknown
+
+  constructor(code: PageServiceErrorCode, message: string, cause?: unknown) {
+    super(message)
+    this.name = 'PageServiceError'
+    this.code = code
+    this.cause = cause
+  }
+}
+
 let supabaseInstance: SupabaseClient | null = null
 
 function getSupabase(): SupabaseClient {
@@ -11,7 +25,11 @@ function getSupabase(): SupabaseClient {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error('Supabase environment variables not configured')
+      throw new PageServiceError(
+        'CONFIG_MISSING',
+        'Supabase environment variables not configured',
+        { supabaseUrlPresent: !!supabaseUrl, supabaseServiceKeyPresent: !!supabaseServiceKey }
+      )
     }
 
     supabaseInstance = createClient(supabaseUrl, supabaseServiceKey)
@@ -51,7 +69,7 @@ export async function createPage(input: CreatePageInput & { userId?: string; ano
     console.error('Error code:', error.code)
     console.error('Error message:', error.message)
     console.error('Error details:', error.details)
-    throw new Error(`Failed to create page: ${error.message} (code: ${error.code})`)
+    throw new PageServiceError('DB_ERROR', `Failed to create page: ${error.message} (code: ${error.code})`, error)
   }
 
   console.log('Page created successfully:', data?.id)

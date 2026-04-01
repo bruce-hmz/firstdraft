@@ -179,8 +179,28 @@
     "saveProject": "保存项目",
     "regenerate": "重新生成",
     "proBadge": "Pro",
+    "newMobileApp": "新移动应用",
     "newProduct": "新产品",
     "generatedBy": "由 FirstDraft 生成"
+  },
+  "templateSelect": {
+    "backToIdea": "重新输入想法",
+    "title": "选择页面模板",
+    "subtitle": "为「{idea}」选择最适合的展示模板",
+    "templates": {
+      "default": {
+        "name": "SaaS 产品模板",
+        "description": "适合软件产品、SaaS服务，经典落地页布局"
+      },
+      "mobileApp": {
+        "name": "移动应用模板",
+        "description": "适合手机App，突出预览展示和应用商店下载"
+      },
+      "physicalProduct": {
+        "name": "实体商品模板",
+        "description": "适合实体产品，突出图片位置和购物体验"
+      }
+    }
   },
   "drafts": {
     "title": "创建新页面",

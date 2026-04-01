@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createPage, getShareUrl } from '@/lib/pages/service'
+import { createPage, getShareUrl, PageServiceError } from '@/lib/pages/service'
 import type { PageContent, CreatePageInput } from '@/types'
 
 interface SavePageRequest {
@@ -10,9 +10,35 @@ interface SavePageRequest {
   anonymousId?: string
 }
 
+async function parseJsonBody<T>(request: NextRequest): Promise<{ ok: true; value: T } | { ok: false; error: string }> {
+  try {
+    const text = await request.text()
+    if (!text) {
+      return { ok: false, error: 'EMPTY_BODY' }
+    }
+    return { ok: true, value: JSON.parse(text) as T }
+  } catch {
+    return { ok: false, error: 'INVALID_JSON' }
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const body: SavePageRequest = await request.json()
+    const parsed = await parseJsonBody<SavePageRequest>(request)
+    if (!parsed.ok) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: parsed.error,
+            message: parsed.error === 'EMPTY_BODY' ? '请求体不能为空' : '请求体不是合法 JSON',
+          },
+        },
+        { status: 400 }
+      )
+    }
+
+    const body = parsed.value
 
     if (!body.title || !body.content) {
       return NextResponse.json(
@@ -67,18 +93,51 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Create share link error:', error)
 
-    const errorMessage = error instanceof Error ? error.message : '创建分享链接失败'
-    const errorStack = error instanceof Error ? error.stack : undefined
-    
-    console.error('Error details:', { message: errorMessage, stack: errorStack })
+    if (error instanceof Error && error.message.includes('Supabase configuration missing')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'CONFIG_MISSING',
+            message: '分享服务暂不可用',
+          },
+        },
+        { status: 503 }
+      )
+    }
+
+    if (error instanceof PageServiceError) {
+      if (error.code === 'CONFIG_MISSING') {
+        return NextResponse.json(
+          {
+            success: false,
+            error: {
+              code: error.code,
+              message: '分享服务暂不可用',
+            },
+          },
+          { status: 503 }
+        )
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: error.code,
+            message: '创建分享链接失败',
+          },
+        },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json(
       {
         success: false,
         error: {
           code: 'INTERNAL_ERROR',
-          message: errorMessage,
-          details: errorStack,
+          message: '创建分享链接失败',
         },
       },
       { status: 500 }
