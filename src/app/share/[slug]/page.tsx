@@ -123,7 +123,6 @@ export default async function SharePage({ params }: SharePageProps) {
       .from('pages')
       .select('*')
       .eq('slug', resolvedParams.slug)
-      .eq('status', 'active')
       .single();
 
     if (error || !data) {
@@ -145,13 +144,16 @@ export default async function SharePage({ params }: SharePageProps) {
     const TemplateComponent = getTemplate((pageData.template as TemplateType) || TemplateType.DEFAULT);
 
     // Increment view count asynchronously (best effort)
-    void supabase
-      .rpc('increment_view_count', { page_slug: resolvedParams.slug })
-      .then(({ error: rpcError }) => {
+    void (async () => {
+      try {
+        const { error: rpcError } = await supabase.rpc('increment_view_count', { page_slug: resolvedParams.slug });
         if (rpcError) {
           console.warn('increment_view_count failed:', rpcError);
         }
-      });
+      } catch (error) {
+        console.warn('Error incrementing view count:', error);
+      }
+    })();
 
     return <TemplateComponent content={content} />;
   } catch (error) {

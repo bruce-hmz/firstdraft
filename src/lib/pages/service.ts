@@ -52,37 +52,17 @@ export async function createPage(input: CreatePageInput & { userId?: string; ano
   const slug = await generateUniqueSlug()
   console.log('Generated slug:', slug)
 
+  // 简化插入数据，只包含必要字段
   const insertData = {
     slug,
     title: input.title,
     content: input.content,
-    template: input.metadata?.template || 'default',
     metadata: input.metadata || {},
-    user_id: input.userId || null,
-    anonymous_id: input.anonymousId || null,
   }
 
   console.log('Inserting data:', JSON.stringify(insertData, null, 2))
 
   let { data, error } = await supabase.from(PAGE_TABLE).insert(insertData).select().single()
-
-  // Backward compatibility: if DB schema is older (missing optional columns),
-  // retry with a minimal set of fields.
-  if (error && looksLikeMissingColumnError(error)) {
-    console.warn('Detected missing column error; retrying insert with minimal fields.', {
-      code: error.code,
-      message: error.message,
-    })
-
-    const minimalInsertData = {
-      slug,
-      title: input.title,
-      content: input.content,
-      metadata: input.metadata || {},
-    }
-
-    ;({ data, error } = await supabase.from(PAGE_TABLE).insert(minimalInsertData).select().single())
-  }
 
   if (error) {
     console.error('Failed to create page:', error)
@@ -98,30 +78,38 @@ export async function createPage(input: CreatePageInput & { userId?: string; ano
 
 export async function getPageBySlug(slug: string): Promise<PageDbModel | null> {
   const supabase = getSupabase()
-  const { data, error } = await supabase
-    .from(PAGE_TABLE)
-    .select('*')
-    .eq('slug', slug)
-    .eq('status', 'active')
-    .single()
+  try {
+    const { data, error } = await supabase
+      .from(PAGE_TABLE)
+      .select('*')
+      .eq('slug', slug)
+      .single()
 
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null
+      }
+      console.error('Failed to get page:', error)
+      throw new Error(`Failed to get page: ${error.message}`)
     }
-    console.error('Failed to get page:', error)
-    throw new Error(`Failed to get page: ${error.message}`)
-  }
 
-  return data as PageDbModel
+    return data as PageDbModel
+  } catch (error) {
+    console.error('Error in getPageBySlug:', error)
+    throw error
+  }
 }
 
 export async function incrementViewCount(slug: string): Promise<void> {
   const supabase = getSupabase()
-  const { error } = await supabase.rpc('increment_view_count', { page_slug: slug })
+  try {
+    const { error } = await supabase.rpc('increment_view_count', { page_slug: slug })
 
-  if (error) {
-    console.error('Failed to increment view count:', error)
+    if (error) {
+      console.error('Failed to increment view count:', error)
+    }
+  } catch (error) {
+    console.error('Error in incrementViewCount:', error)
   }
 }
 
