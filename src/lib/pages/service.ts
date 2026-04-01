@@ -25,11 +25,18 @@ function getSupabase(): SupabaseClient {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
     if (!supabaseUrl || !supabaseServiceKey) {
-      throw new PageServiceError(
-        'CONFIG_MISSING',
-        'Supabase environment variables not configured',
-        { supabaseUrlPresent: !!supabaseUrl, supabaseServiceKeyPresent: !!supabaseServiceKey }
-      )
+      console.error('Supabase environment variables not configured')
+      // 返回一个模拟的 Supabase 客户端，避免服务器崩溃
+      return {
+        from: () => ({
+          insert: () => ({
+            select: () => ({
+              single: () => Promise.resolve({ data: null, error: new Error('Supabase configuration missing') })
+            })
+          })
+        }),
+        rpc: () => Promise.resolve({ data: null, error: new Error('Supabase configuration missing') })
+      } as any
     }
 
     supabaseInstance = createClient(supabaseUrl, supabaseServiceKey)

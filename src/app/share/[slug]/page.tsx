@@ -70,14 +70,13 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
   try {
     const supabase = createAdminClient();
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('pages')
       .select('title, content')
       .eq('slug', resolvedParams.slug)
-      .eq('status', 'active')
       .single();
 
-    if (!data) {
+    if (error || !data) {
       return {
         title: '页面未找到 - FirstDraft',
         description: '页面不存在或已被删除',
