@@ -145,9 +145,13 @@ export default async function SharePage({ params }: SharePageProps) {
     const TemplateComponent = getTemplate((pageData.template as TemplateType) || TemplateType.DEFAULT);
 
     // Increment view count asynchronously (best effort)
-    void supabase.rpc('increment_view_count', { page_slug: resolvedParams.slug }).catch((e) => {
-      console.warn('increment_view_count failed:', e);
-    });
+    void supabase
+      .rpc('increment_view_count', { page_slug: resolvedParams.slug })
+      .then(({ error: rpcError }) => {
+        if (rpcError) {
+          console.warn('increment_view_count failed:', rpcError);
+        }
+      });
 
     return <TemplateComponent content={content} />;
   } catch (error) {
