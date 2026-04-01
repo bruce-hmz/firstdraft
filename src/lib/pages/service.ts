@@ -39,6 +39,12 @@ function getSupabase(): SupabaseClient {
 
 const PAGE_TABLE = 'pages'
 
+function looksLikeMissingColumnError(error: { code?: string | null; message?: string | null } | null | undefined): boolean {
+  const code = error?.code || ''
+  const message = (error?.message || '').toLowerCase()
+  return code === '42703' || message.includes('column') && message.includes('does not exist')
+}
+
 export async function createPage(input: CreatePageInput & { userId?: string; anonymousId?: string }): Promise<PageDbModel | null> {
   const supabase = getSupabase()
   console.log('Creating page with input:', { title: input.title, hasUser: !!input.userId, hasAnonymous: !!input.anonymousId })
@@ -58,11 +64,25 @@ export async function createPage(input: CreatePageInput & { userId?: string; ano
 
   console.log('Inserting data:', JSON.stringify(insertData, null, 2))
 
-  const { data, error } = await supabase
-    .from(PAGE_TABLE)
-    .insert(insertData)
-    .select()
-    .single()
+  let { data, error } = await supabase.from(PAGE_TABLE).insert(insertData).select().single()
+
+  // Backward compatibility: if DB schema is older (missing optional columns),
+  // retry with a minimal set of fields.
+  if (error && looksLikeMissingColumnError(error)) {
+    console.warn('Detected missing column error; retrying insert with minimal fields.', {
+      code: error.code,
+      message: error.message,
+    })
+
+    const minimalInsertData = {
+      slug,
+      title: input.title,
+      content: input.content,
+      metadata: input.metadata || {},
+    }
+
+    ;({ data, error } = await supabase.from(PAGE_TABLE).insert(minimalInsertData).select().single())
+  }
 
   if (error) {
     console.error('Failed to create page:', error)
