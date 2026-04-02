@@ -105,10 +105,39 @@ Format the response as a JSON object with these fields.
         },
       });
     } catch (error) {
-      return NextResponse.json(
-        { error: 'Failed to parse generated content' },
-        { status: 500 }
-      );
+      // 尝试提取有效的 JSON 部分
+      try {
+        const rationalClean = rationalContent.replace(/^[\s\S]*?({[\s\S]*})[\s\S]*$/, '$1');
+        const emotionalClean = emotionalContent.replace(/^[\s\S]*?({[\s\S]*})[\s\S]*$/, '$1');
+        
+        const rationalData = JSON.parse(rationalClean);
+        const emotionalData = JSON.parse(emotionalClean);
+        
+        return NextResponse.json({
+          success: true,
+          data: {
+            versions: [
+              {
+                id: 'rational',
+                name: 'Rational (Feature-focused)',
+                description: 'Focuses on features, functionality, and practical benefits',
+                content: rationalData
+              },
+              {
+                id: 'emotional',
+                name: 'Emotional (Experience-focused)',
+                description: 'Focuses on user experience, emotional benefits, and storytelling',
+                content: emotionalData
+              }
+            ]
+          },
+        });
+      } catch (cleanError) {
+        return NextResponse.json(
+          { error: 'Failed to parse generated content' },
+          { status: 500 }
+        );
+      }
     }
 
 
