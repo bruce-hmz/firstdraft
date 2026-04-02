@@ -56,10 +56,10 @@ export function ABSelectionStep() {
       if (data.success) {
         setVersions(data.data.versions);
       } else {
-        setError(data.error || 'Failed to generate versions');
+        setError(data.error || t('abSelection.failedToGenerateVersions'));
       }
     } catch (error) {
-      setError('Failed to generate versions');
+      setError(t('abSelection.failedToGenerateVersions'));
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ export function ABSelectionStep() {
     return (
       <div className="p-8 text-center">
         <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-        <p className="text-neutral-600">Generating A/B versions...</p>
+        <p className="text-neutral-600">{t('abSelection.generatingVersions')}</p>
       </div>
     );
   }
@@ -171,15 +171,15 @@ export function ABSelectionStep() {
                   </p>
                   <div className="space-y-3">
                     <div>
-                      <h4 className="text-sm font-medium text-neutral-700 mb-1">Product Name</h4>
+                      <h4 className="text-sm font-medium text-neutral-700 mb-1">{t('abSelection.productNameLabel')}</h4>
                       <p className="text-neutral-900">{version.content.product_name}</p>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-neutral-700 mb-1">Tagline</h4>
+                      <h4 className="text-sm font-medium text-neutral-700 mb-1">{t('abSelection.taglineLabel')}</h4>
                       <p className="text-neutral-900">{version.content.tagline}</p>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-neutral-700 mb-1">Description</h4>
+                      <h4 className="text-sm font-medium text-neutral-700 mb-1">{t('abSelection.descriptionLabel')}</h4>
                       <p className="text-neutral-600 line-clamp-2">{version.content.description}</p>
                     </div>
                   </div>

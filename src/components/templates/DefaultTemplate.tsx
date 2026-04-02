@@ -112,8 +112,12 @@ export function DefaultTemplate({ content, showBranding = true, pageId, media = 
               </div>
 
               <div className="text-center p-8 bg-neutral-50 rounded-2xl">
-                <Button size="lg" className="bg-neutral-900 hover:bg-neutral-800 text-white px-8">
-                  {content.ctaSection.text}
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-neutral-900 hover:bg-neutral-800 text-white px-8"
+                >
+                  <Link href="/billing/plans">{content.ctaSection.text}</Link>
                 </Button>
                 {content.ctaSection.subtext && (
                   <p className="text-sm text-neutral-500 mt-3">{content.ctaSection.subtext}</p>

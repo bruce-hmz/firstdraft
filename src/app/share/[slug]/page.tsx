@@ -2,6 +2,19 @@ import type { Metadata } from 'next';
 import { createAdminClient } from '@/lib/supabase';
 import { getTemplate, TemplateType } from '@/components/templates';
 import type { PageContent } from '@/types';
+import { cookies } from 'next/headers';
+import { COOKIE_NAME, defaultLocale, type Locale } from '@/i18n/config';
+
+async function getLocaleFromCookie(): Promise<Locale> {
+  try {
+    const cookieStore = await cookies();
+    const raw = cookieStore.get(COOKIE_NAME)?.value;
+    if (raw === 'zh-CN' || raw === 'en') return raw;
+  } catch {
+    // ignore (cookies might be unavailable during some tooling/build steps)
+  }
+  return defaultLocale;
+}
 
 function coerceString(value: unknown, fallback: string): string {
   return typeof value === 'string' && value.trim().length > 0 ? value : fallback;
@@ -12,24 +25,28 @@ function coerceStringArray(value: unknown): string[] {
   return value.filter((v) => typeof v === 'string' && v.trim().length > 0) as string[];
 }
 
-function coercePageContent(raw: unknown): PageContent {
+function coercePageContent(raw: unknown, locale: Locale): PageContent {
   const r = (raw || {}) as any;
   const problem = r.problemSection || {};
   const solution = r.solutionSection || {};
   const cta = r.ctaSection || {};
 
+  const featureTitleFallback = locale === 'zh-CN' ? '功能' : 'Feature';
+  const productNameFallback = locale === 'zh-CN' ? '未命名产品' : 'Untitled';
+  const ctaTextFallback = locale === 'zh-CN' ? '开始使用' : 'Get Started';
+
   const painPoints = coerceStringArray(problem.painPoints);
   const featuresRaw = Array.isArray(solution.features) ? solution.features : [];
   const features = featuresRaw
     .map((f: any) => ({
-      title: coerceString(f?.title, 'Feature'),
+      title: coerceString(f?.title, featureTitleFallback),
       description: coerceString(f?.description, ''),
       icon: typeof f?.icon === 'string' ? f.icon : undefined,
     }))
     .filter((f: any) => f.title || f.description);
 
   return {
-    productName: coerceString(r.productName, coerceString(r.title, 'Untitled')),
+    productName: coerceString(r.productName, coerceString(r.title, productNameFallback)),
     tagline: coerceString(r.tagline, ''),
     description: typeof r.description === 'string' ? r.description : '',
     problemSection: {
@@ -43,7 +60,7 @@ function coercePageContent(raw: unknown): PageContent {
       features,
     },
     ctaSection: {
-      text: coerceString(cta.text, 'Get Started'),
+      text: coerceString(cta.text, ctaTextFallback),
       subtext: typeof cta.subtext === 'string' ? cta.subtext : undefined,
     },
   };
@@ -72,6 +89,7 @@ interface MediaItem {
 
 export async function generateMetadata({ params }: SharePageProps): Promise<Metadata> {
   const resolvedParams = await params;
+  const locale = await getLocaleFromCookie();
   try {
     const supabase = createAdminClient();
 
@@ -88,38 +106,41 @@ export async function generateMetadata({ params }: SharePageProps): Promise<Meta
       };
     }
 
-    const content = coercePageContent(data.content);
-    const description = content.description || content.tagline || `由 FirstDraft AI 生成的产品落地页`;
+    const content = coercePageContent(data.content, locale);
+    const defaultDescription =
+      locale === 'zh-CN' ? '由 FirstDraft AI 生成的产品落地页' : 'FirstDraft AI generated product landing page';
+    const localizedDescription = content.description || content.tagline || defaultDescription;
 
     const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const url = `${siteUrl}/share/${resolvedParams.slug}`;
 
     return {
       title: `${content.productName} | FirstDraft`,
-      description,
+      description: localizedDescription,
       openGraph: {
         title: content.productName,
-        description,
+        description: localizedDescription,
         url,
         type: 'website',
       },
       twitter: {
         card: 'summary_large_image',
         title: content.productName,
-        description,
+        description: localizedDescription,
       },
     };
   } catch (error) {
     console.error('Share generateMetadata error:', error);
     return {
       title: 'FirstDraft',
-      description: '由 FirstDraft AI 生成的产品落地页',
+      description: locale === 'zh-CN' ? '由 FirstDraft AI 生成的产品落地页' : 'FirstDraft AI generated product landing page',
     };
   }
 }
 
 export default async function SharePage({ params }: SharePageProps) {
   const resolvedParams = await params;
+  const locale = await getLocaleFromCookie();
   try {
     const supabase = createAdminClient();
 
@@ -155,7 +176,7 @@ export default async function SharePage({ params }: SharePageProps) {
     }
 
     const pageData = data as PageData;
-    const content = coercePageContent(pageData.content);
+    const content = coercePageContent(pageData.content, locale);
     const TemplateComponent = getTemplate((pageData.template as TemplateType) || TemplateType.DEFAULT);
 
     // 获取分析配置

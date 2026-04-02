@@ -250,6 +250,7 @@
     "alipayPay": "支付宝支付",
     "cardPay": "信用卡支付",
     "later": "稍后再说",
+    "buyNow": "立即购买",
     "terms": "支付即表示您同意我们的服务条款。额度永久有效，可随时使用。",
     "recommended": "推荐",
     "paymentError": "创建支付会话失败，请重试",
@@ -395,7 +396,12 @@
   "abSelection": {
     "title": "选择文案版本",
     "description": "我们为你生成了两套不同风格的文案，选择你喜欢的版本",
-    "continue": "继续"
+    "continue": "继续",
+    "generatingVersions": "正在生成 A/B 版本...",
+    "failedToGenerateVersions": "生成版本失败",
+    "productNameLabel": "产品名称",
+    "taglineLabel": "标语",
+    "descriptionLabel": "描述"
   },
   "errors": {
     "authError": "认证失败",

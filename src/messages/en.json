@@ -250,6 +250,7 @@
     "alipayPay": "Alipay",
     "cardPay": "Card Payment",
     "later": "Maybe Later",
+    "buyNow": "Buy Now",
     "terms": "By paying, you agree to our Terms of Service. Credits are permanently valid and can be used at any time.",
     "recommended": "Recommended",
     "paymentError": "Failed to create payment session, please try again",
@@ -395,7 +396,12 @@
   "abSelection": {
     "title": "Choose Copy Version",
     "description": "We've generated two different style versions for you, select the one you prefer",
-    "continue": "Continue"
+    "continue": "Continue",
+    "generatingVersions": "Generating A/B versions...",
+    "failedToGenerateVersions": "Failed to generate versions",
+    "productNameLabel": "Product Name",
+    "taglineLabel": "Tagline",
+    "descriptionLabel": "Description"
   },
   "errors": {
     "authError": "Authentication failed",

@@ -12,9 +12,14 @@ import { ArrowLeft } from 'lucide-react';
 interface MobileAppTemplateProps {
   content: PageContent;
   showBranding?: boolean;
+  media?: Array<{ id: string; url: string }>;
 }
 
-export function MobileAppTemplate({ content, showBranding = true }: MobileAppTemplateProps) {
+export function MobileAppTemplate({
+  content,
+  showBranding = true,
+  media = [],
+}: MobileAppTemplateProps) {
   const t = useTranslations();
 
   return (
@@ -38,14 +43,22 @@ export function MobileAppTemplate({ content, showBranding = true }: MobileAppTem
             <div className="bg-black rounded-[40px] p-3 shadow-xl inline-block mx-auto">
               <div className="w-[270px] h-[540px] bg-white rounded-[32px] overflow-hidden relative">
                 {/* Phone screen mockup - content would go here, we just show the placeholder for the generated page */}
-                <div className="p-4">
-                  <div className="w-full h-8 bg-gray-200 rounded-full mb-4"></div>
-                  <div className="space-y-3">
-                    <div className="w-3/4 h-4 bg-gray-100 rounded"></div>
-                    <div className="w-full h-12 bg-gray-50 rounded"></div>
-                    <div className="w-2/3 h-10 bg-indigo-500 rounded-full"></div>
+                {media.length > 0 ? (
+                  <img
+                    src={media[0].url}
+                    alt="产品图片"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="p-4">
+                    <div className="w-full h-8 bg-gray-200 rounded-full mb-4"></div>
+                    <div className="space-y-3">
+                      <div className="w-3/4 h-4 bg-gray-100 rounded"></div>
+                      <div className="w-full h-12 bg-gray-50 rounded"></div>
+                      <div className="w-2/3 h-10 bg-indigo-500 rounded-full"></div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
             <div className="absolute -bottom-4 -right-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-2 rounded-full shadow-lg">
@@ -106,8 +119,12 @@ export function MobileAppTemplate({ content, showBranding = true }: MobileAppTem
             <p className="text-indigo-100 mb-8 text-lg">{content.ctaSection.subtext}</p>
           )}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-indigo-600 hover:bg-indigo-50 px-12">
-              Download Now
+            <Button
+              asChild
+              size="lg"
+              className="bg-white text-indigo-600 hover:bg-indigo-50 px-12"
+            >
+              <Link href="/billing/plans">{t('billing.buyNow')}</Link>
             </Button>
           </div>
         </div>

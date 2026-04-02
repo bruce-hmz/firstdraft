@@ -12,9 +12,14 @@ import { ArrowLeft, ShoppingCart } from 'lucide-react';
 interface PhysicalProductTemplateProps {
   content: PageContent;
   showBranding?: boolean;
+  media?: Array<{ id: string; url: string }>;
 }
 
-export function PhysicalProductTemplate({ content, showBranding = true }: PhysicalProductTemplateProps) {
+export function PhysicalProductTemplate({
+  content,
+  showBranding = true,
+  media = [],
+}: PhysicalProductTemplateProps) {
   const t = useTranslations();
 
   return (
@@ -47,9 +52,15 @@ export function PhysicalProductTemplate({ content, showBranding = true }: Physic
             {content.description && (
               <p className="text-neutral-500 mb-10">{content.description}</p>
             )}
-            <Button size="lg" className="bg-amber-600 hover:bg-amber-700 text-white px-10 py-6 text-lg gap-2">
-              <ShoppingCart className="h-5 w-5" />
-              {content.ctaSection.text}
+            <Button
+              asChild
+              size="lg"
+              className="bg-amber-600 hover:bg-amber-700 text-white px-10 py-6 text-lg gap-2"
+            >
+              <Link href="/billing/plans" className="inline-flex items-center gap-2">
+                <ShoppingCart className="h-5 w-5" />
+                {content.ctaSection.text}
+              </Link>
             </Button>
             {content.ctaSection.subtext && (
               <p className="text-sm text-neutral-500 mt-4">{content.ctaSection.subtext}</p>
@@ -57,10 +68,17 @@ export function PhysicalProductTemplate({ content, showBranding = true }: Physic
           </div>
           <div className="relative">
             <div className="aspect-square bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl shadow-xl flex items-center justify-center">
-              {/* Product image placeholder - user can replace with actual product image */}
-              <div className="text-8xl text-amber-300">
-                <ShoppingCart />
-              </div>
+              {media.length > 0 ? (
+                <img
+                  src={media[0].url}
+                  alt="产品图片"
+                  className="w-full h-full object-cover rounded-3xl"
+                />
+              ) : (
+                <div className="text-8xl text-amber-300">
+                  <ShoppingCart />
+                </div>
+              )}
             </div>
           </div>
         </div>
