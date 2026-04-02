@@ -73,7 +73,34 @@ export function ABSelectionStep() {
       if (selected) {
         // 转换 snake_case 为 camelCase
         const camelCaseContent = snakeToCamel(selected.content);
-        setResult(camelCaseContent, '', '');
+        
+        // 转换 API 返回的结构为 PageContent 结构
+        const pageContent = {
+          productName: camelCaseContent.productName || '',
+          tagline: camelCaseContent.tagline || '',
+          description: camelCaseContent.description || '',
+          problemSection: {
+            headline: '问题',
+            description: camelCaseContent.problemSection || '',
+            painPoints: [camelCaseContent.problemSection || '']
+          },
+          solutionSection: {
+            headline: '解决方案',
+            description: camelCaseContent.solutionSection || '',
+            features: [
+              {
+                title: '核心功能',
+                description: camelCaseContent.solutionSection || ''
+              }
+            ]
+          },
+          ctaSection: {
+            text: camelCaseContent.cta || '',
+            subtext: ''
+          }
+        };
+        
+        setResult(pageContent, '', '');
         setGenerationStep('result');
       }
     }
