@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
-export async function GET(request: NextRequest, { params }: { params: { code: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   const supabase = await createClient();
-  const { code } = params;
+  const { code } = await params;
 
   try {
     // 查找短链接
