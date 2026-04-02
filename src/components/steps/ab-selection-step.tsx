@@ -35,6 +35,41 @@ export function ABSelectionStep() {
     }, {} as any);
   };
 
+  const splitIntoThree = (text: unknown): string[] => {
+    const raw = typeof text === 'string' ? text : '';
+    const cleaned = raw.replace(/\s+/g, ' ').replace(/\n+/g, ' ').trim();
+    if (!cleaned) return [];
+
+    // 先按中文句号/感叹号等切成段落
+    const sentenceParts = cleaned
+      .split(/[。！？!?；;]+/g)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (sentenceParts.length >= 3) return sentenceParts.slice(0, 3);
+
+    // 再按顿号/英文逗号切
+    const clauseParts = cleaned
+      .split(/[、,]+/g)
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (clauseParts.length >= 3) return clauseParts.slice(0, 3);
+
+    // 最后兜底：按字符长度切三段（保证至少 1-3 段都有内容）
+    const partSize = Math.ceil(cleaned.length / 3);
+    const parts = [
+      cleaned.slice(0, partSize).trim(),
+      cleaned.slice(partSize, partSize * 2).trim(),
+      cleaned.slice(partSize * 2).trim(),
+    ].filter(Boolean);
+
+    if (parts.length === 0) return [];
+    if (parts.length >= 3) return parts.slice(0, 3);
+
+    // 不足 3 段时用最后一段补齐，让模板的 grid 能正确展开
+    while (parts.length < 3) parts.push(parts[parts.length - 1]);
+    return parts.slice(0, 3);
+  };
+
   useEffect(() => {
     generateVersions();
   }, [idea, brandStyle]);
@@ -75,6 +110,20 @@ export function ABSelectionStep() {
       if (selected) {
         // 转换 snake_case 为 camelCase
         const camelCaseContent = snakeToCamel(selected.content);
+
+        const problemText = typeof camelCaseContent.problemSection === 'string' ? camelCaseContent.problemSection : '';
+        const solutionText = typeof camelCaseContent.solutionSection === 'string' ? camelCaseContent.solutionSection : '';
+        const painPoints = splitIntoThree(problemText);
+        const featureDescriptions = splitIntoThree(solutionText);
+
+        const ctaText =
+          typeof camelCaseContent.cta === 'string'
+            ? camelCaseContent.cta
+            : typeof camelCaseContent.ctaSection === 'string'
+              ? camelCaseContent.ctaSection
+              : typeof camelCaseContent.ctaSection?.text === 'string'
+                ? camelCaseContent.ctaSection.text
+                : '';
         
         // 转换 API 返回的结构为 PageContent 结构
         const pageContent = {
@@ -83,21 +132,27 @@ export function ABSelectionStep() {
           description: camelCaseContent.description || '',
           problemSection: {
             headline: t('common.problem'),
-            description: camelCaseContent.problemSection || '',
-            painPoints: [camelCaseContent.problemSection || '']
+            description: problemText || '',
+            painPoints: painPoints.length > 0 ? painPoints : [problemText || '']
           },
           solutionSection: {
             headline: t('common.solution'),
-            description: camelCaseContent.solutionSection || '',
-            features: [
-              {
-                title: t('common.coreFeatures'),
-                description: camelCaseContent.solutionSection || ''
-              }
-            ]
+            description: solutionText || '',
+            features:
+              featureDescriptions.length > 0
+                ? featureDescriptions.map((desc) => ({
+                    title: t('common.coreFeatures'),
+                    description: desc,
+                  }))
+                : [
+                    {
+                      title: t('common.coreFeatures'),
+                      description: solutionText || '',
+                    },
+                  ],
           },
           ctaSection: {
-            text: camelCaseContent.cta || '',
+            text: ctaText || '',
             subtext: ''
           }
         };
