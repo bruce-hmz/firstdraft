@@ -42,7 +42,7 @@ export default function TemplateSelectPage() {
 
   const handleSelect = (templateId: string) => {
     setTemplate(templateId);
-    setGenerationStep('questions');
+    setGenerationStep('brand-style');
     router.push('/generate');
   };
 

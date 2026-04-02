@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type GenerationStep = 'input' | 'template' | 'questions' | 'generating' | 'result';
+export type GenerationStep = 'input' | 'template' | 'brand-style' | 'ai-questions' | 'questions' | 'ab-selection' | 'generating' | 'result';
 
 export interface Question {
   id: string;
@@ -39,6 +39,7 @@ interface AppState {
     step: GenerationStep;
     idea: string;
     template?: string;
+    brandStyle?: string;
     questions: Question[];
     answers: Record<string, string>;
     result: PageContent | null;
@@ -50,6 +51,7 @@ interface AppState {
   setGenerationStep: (step: GenerationStep) => void;
   setIdea: (idea: string) => void;
   setTemplate: (template: string) => void;
+  setBrandStyle: (brandStyle: string) => void;
   setQuestions: (questions: Question[]) => void;
   setAnswer: (id: string, value: string) => void;
   setAnswers: (answers: Record<string, string>) => void;
@@ -77,6 +79,7 @@ const initialFlowState = {
   step: 'input' as GenerationStep,
   idea: '',
   template: 'default',
+  brandStyle: 'default',
   questions: [],
   answers: {},
   result: null,
@@ -102,6 +105,7 @@ export const useAppStore = create<AppState>()(
           generationFlow: { 
             ...state.generationFlow, 
             idea,
+            brandStyle: 'default',
             questions: [],
             answers: {},
             result: null,
@@ -116,6 +120,14 @@ export const useAppStore = create<AppState>()(
           generationFlow: { 
             ...state.generationFlow, 
             template
+          } 
+        })),
+      
+      setBrandStyle: (brandStyle) => 
+        set((state) => ({ 
+          generationFlow: { 
+            ...state.generationFlow, 
+            brandStyle
           } 
         })),
       

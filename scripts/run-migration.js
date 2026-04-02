@@ -26,7 +26,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey)
 async function runMigration() {
   console.log('开始执行数据库迁移...')
 
-  const migrationPath = path.join(__dirname, '../migrations/001_create_pages_table.sql')
+  const migrationPath = path.join(__dirname, '../migrations/002_create_subscriptions_table.sql')
   const sql = fs.readFileSync(migrationPath, 'utf8')
 
   console.log('读取迁移文件:', migrationPath)

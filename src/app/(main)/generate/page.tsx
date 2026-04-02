@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from '@/lib/next-intl';
 import { useAppStore } from '@/stores/app-store';
 import { QuestionsStep } from '@/components/steps/questions-step';
+import { BrandStyleStep } from '@/components/steps/brand-style-step';
+import { AIQuestionsStep } from '@/components/steps/ai-questions-step';
+import { ABSelectionStep } from '@/components/steps/ab-selection-step';
 import { GeneratingStep } from '@/components/steps/generating-step';
 import { ResultStep } from '@/components/steps/result-step';
 import { Button } from '@/components/ui/button';
@@ -27,8 +30,14 @@ export default function GeneratePage() {
 
   const handleBack = () => {
     if (step === 'result') {
+      setGenerationStep('ab-selection');
+    } else if (step === 'ab-selection') {
       setGenerationStep('questions');
     } else if (step === 'questions') {
+      setGenerationStep('ai-questions');
+    } else if (step === 'ai-questions') {
+      setGenerationStep('brand-style');
+    } else if (step === 'brand-style') {
       resetFlow();
       router.push('/');
     }
@@ -54,6 +63,30 @@ export default function GeneratePage() {
           </div>
         )}
 
+        {step === 'brand-style' && (
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+              {t('generate.pageTitle')}
+            </h1>
+            <p className="text-neutral-600 mb-8">
+              {t('generate.pageDescription')}
+            </p>
+            <BrandStyleStep />
+          </div>
+        )}
+
+        {step === 'ai-questions' && (
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+              {t('generate.pageTitle')}
+            </h1>
+            <p className="text-neutral-600 mb-8">
+              {t('generate.pageDescription')}
+            </p>
+            <AIQuestionsStep />
+          </div>
+        )}
+
         {step === 'questions' && (
           <div>
             <h1 className="text-2xl font-bold text-neutral-900 mb-2">
@@ -63,6 +96,18 @@ export default function GeneratePage() {
               {t('generate.pageDescription')}
             </p>
             <QuestionsStep />
+          </div>
+        )}
+
+        {step === 'ab-selection' && (
+          <div>
+            <h1 className="text-2xl font-bold text-neutral-900 mb-2">
+              {t('generate.pageTitle')}
+            </h1>
+            <p className="text-neutral-600 mb-8">
+              {t('generate.pageDescription')}
+            </p>
+            <ABSelectionStep />
           </div>
         )}
 

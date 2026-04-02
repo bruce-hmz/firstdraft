@@ -142,6 +142,19 @@ export default async function SharePage({ params }: SharePageProps) {
     const content = coercePageContent(pageData.content);
     const TemplateComponent = getTemplate((pageData.template as TemplateType) || TemplateType.DEFAULT);
 
+    // 获取分析配置
+    let analyticsConfig = null;
+    try {
+      const { data: config } = await supabase
+        .from('analytics_configs')
+        .select('*')
+        .eq('page_id', pageData.id)
+        .single();
+      analyticsConfig = config;
+    } catch (error) {
+      console.warn('Error fetching analytics config:', error);
+    }
+
     // Increment view count asynchronously (best effort)
     void (async () => {
       try {
@@ -154,7 +167,57 @@ export default async function SharePage({ params }: SharePageProps) {
       }
     })();
 
-    return <TemplateComponent content={content} />;
+    return (
+      <>
+        {/* Google Analytics */}
+        {analyticsConfig?.google_analytics_id && analyticsConfig?.enabled && (
+          <script
+            async
+            src={`https://www.googletagmanager.com/gtag/js?id=${analyticsConfig.google_analytics_id}`}
+          />
+        )}
+        {analyticsConfig?.google_analytics_id && analyticsConfig?.enabled && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${analyticsConfig.google_analytics_id}');
+              `
+            }}
+          />
+        )}
+
+        {/* Baidu Analytics */}
+        {analyticsConfig?.baidu_analytics_id && analyticsConfig?.enabled && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                var _hmt = _hmt || [];
+                (function() {
+                  var hm = document.createElement("script");
+                  hm.src = "https://hm.baidu.com/hm.js?${analyticsConfig.baidu_analytics_id}";
+                  var s = document.getElementsByTagName("script")[0];
+                  s.parentNode.insertBefore(hm, s);
+                })();
+              `
+            }}
+          />
+        )}
+
+        {/* Custom Scripts */}
+        {analyticsConfig?.custom_scripts && analyticsConfig?.enabled && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: analyticsConfig.custom_scripts
+            }}
+          />
+        )}
+
+        <TemplateComponent content={content} pageId={pageData.id} />
+      </>
+    );
   } catch (error) {
     console.error('Share page error:', error);
     return (

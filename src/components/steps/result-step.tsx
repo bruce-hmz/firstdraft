@@ -7,12 +7,13 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useAppStore } from '@/stores/app-store';
-import { Copy, Check, RefreshCw, Download, Sparkles, Loader2, Save, Edit2 } from 'lucide-react';
-import { useState } from 'react';
+import { Copy, Check, RefreshCw, Download, Sparkles, Loader2, Save, Edit2, Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from '@/lib/next-intl';
 import type { PageContent } from '@/types';
 import { analytics } from '@/lib/analytics';
+import { LogoSelection } from './logo-selection';
 
 export function ResultStep() {
   const t = useTranslations();
@@ -26,8 +27,118 @@ export function ResultStep() {
   const [saving, setSaving] = useState(false);
   const [currentShareUrl, setCurrentShareUrl] = useState(projectId ? shareUrl : '');
   const [editingField, setEditingField] = useState<string | null>(null);
+  const [media, setMedia] = useState<any[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [analyticsConfig, setAnalyticsConfig] = useState<any>(null);
+  const [editingAnalytics, setEditingAnalytics] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [showLogoSelection, setShowLogoSelection] = useState(false);
 
   if (!result) return null;
+
+  // 加载媒体文件
+  useEffect(() => {
+    if (projectId) {
+      fetch(`/api/upload?page_id=${projectId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setMedia(data.data);
+          }
+        })
+        .catch(error => console.error('Failed to load media:', error));
+
+      // 加载分析配置
+      fetch(`/api/analytics?page_id=${projectId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setAnalyticsConfig(data.data);
+          }
+        })
+        .catch(error => console.error('Failed to load analytics config:', error));
+    }
+  }, [projectId]);
+
+  // 处理文件上传
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !projectId) return;
+
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('page_id', projectId);
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setMedia(prev => [data.data, ...prev]);
+      }
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // 处理文件删除
+  const handleFileDelete = async (id: string) => {
+    if (!confirm('确定要删除这个文件吗？')) return;
+
+    try {
+      const response = await fetch(`/api/upload?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setMedia(prev => prev.filter(item => item.id !== id));
+      }
+    } catch (error) {
+      console.error('Delete failed:', error);
+    }
+  };
+
+  // 保存分析配置
+  const handleSaveAnalytics = async (config: any) => {
+    if (!projectId) return;
+
+    try {
+      const response = await fetch('/api/analytics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          page_id: projectId,
+          ...config
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setAnalyticsConfig(data.data);
+        setEditingAnalytics(false);
+      }
+    } catch (error) {
+      console.error('Save analytics config failed:', error);
+    }
+  };
+
+  // 处理 Logo 选择
+  const handleLogoSelect = (url: string) => {
+    setLogoUrl(url);
+    setShowLogoSelection(false);
+    // 这里可以将 Logo URL 保存到页面数据中
+    updateResult({ logoUrl: url });
+  };
 
   const handleSaveAndShare = async () => {
     console.log('Initiating save and share process...');
@@ -101,7 +212,7 @@ export function ResultStep() {
     setEditingField(null);
   };
 
-  const updateResult = (updates: Partial<PageContent>) => {
+  const updateResult = (updates: Partial<PageContent & { logoUrl?: string }>) => {
     const newResult = { ...result, ...updates };
     setResult(newResult, projectId || '', shareUrl || '');
   };
@@ -136,13 +247,40 @@ export function ResultStep() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex justify-between items-center"
+        className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
       >
         <div>
           <h2 className="text-2xl font-bold text-neutral-900">{t('result.title')}</h2>
           <p className="text-neutral-500 mt-1">{t('result.description')}</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
+          {/* Logo 生成按钮 */}
+          <Button
+            variant="outline"
+            onClick={() => setShowLogoSelection(!showLogoSelection)}
+            className="flex items-center"
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            {logoUrl ? '更换 Logo' : '生成 Logo'}
+          </Button>
+          {/* 文件上传按钮 */}
+          <div className="relative">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileUpload}
+              disabled={uploading}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+            />
+            <Button
+              variant="outline"
+              disabled={uploading}
+              className="flex items-center"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              {uploading ? '上传中...' : '上传图片'}
+            </Button>
+          </div>
           <Button variant="outline" onClick={resetFlow}>
             <RefreshCw className="mr-2 h-4 w-4" />
             {t('result.restart')}
@@ -175,6 +313,144 @@ export function ResultStep() {
             )}
           </Button>
         </div>
+      </motion.div>
+
+      {/* 媒体文件管理 */}
+      {media.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mt-6"
+        >
+          <h3 className="text-lg font-semibold text-neutral-900 mb-4">上传的图片</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {media.map((item) => (
+              <div key={item.id} className="relative group">
+                <div className="aspect-square bg-neutral-100 rounded-md overflow-hidden">
+                  <img
+                    src={item.url}
+                    alt={item.filename}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleFileDelete(item.id)}
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-red-500 text-white hover:bg-red-600"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+                <p className="text-xs text-neutral-600 mt-2 truncate">{item.filename}</p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Logo 选择 */}
+      {showLogoSelection && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="mt-6"
+        >
+          <LogoSelection
+            productName={result.productName}
+            onLogoSelect={handleLogoSelect}
+          />
+        </motion.div>
+      )}
+
+      {/* 分析工具配置 */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mt-6"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-semibold text-neutral-900">分析工具配置</h3>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setEditingAnalytics(!editingAnalytics)}
+          >
+            {editingAnalytics ? '取消' : '配置'}
+          </Button>
+        </div>
+        
+        {editingAnalytics ? (
+          <Card className="p-6">
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">Google Analytics ID</label>
+                <Input
+                  placeholder="UA-XXXXXXXX-X 或 G-XXXXXXXXXX"
+                  defaultValue={analyticsConfig?.google_analytics_id || ''}
+                  onChange={(e) => setAnalyticsConfig(prev => ({ ...prev, google_analytics_id: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">百度统计 ID</label>
+                <Input
+                  placeholder="百度统计站点ID"
+                  defaultValue={analyticsConfig?.baidu_analytics_id || ''}
+                  onChange={(e) => setAnalyticsConfig(prev => ({ ...prev, baidu_analytics_id: e.target.value }))}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">自定义脚本</label>
+                <Textarea
+                  placeholder="添加自定义分析脚本"
+                  defaultValue={analyticsConfig?.custom_scripts || ''}
+                  onChange={(e) => setAnalyticsConfig(prev => ({ ...prev, custom_scripts: e.target.value }))}
+                  rows={4}
+                />
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={analyticsConfig?.enabled ?? true}
+                  onChange={(e) => setAnalyticsConfig(prev => ({ ...prev, enabled: e.target.checked }))}
+                  className="mr-2"
+                />
+                <label className="text-sm text-neutral-700">启用分析</label>
+              </div>
+              <div className="flex justify-end gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setEditingAnalytics(false)}
+                >
+                  取消
+                </Button>
+                <Button
+                  onClick={() => handleSaveAnalytics(analyticsConfig || {})}
+                >
+                  保存
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <Card className="p-6">
+            {analyticsConfig ? (
+              <div className="space-y-2">
+                {analyticsConfig.google_analytics_id && (
+                  <p className="text-sm text-neutral-700">Google Analytics: {analyticsConfig.google_analytics_id}</p>
+                )}
+                {analyticsConfig.baidu_analytics_id && (
+                  <p className="text-sm text-neutral-700">百度统计: {analyticsConfig.baidu_analytics_id}</p>
+                )}
+                <p className="text-sm text-neutral-500">状态: {analyticsConfig.enabled ? '已启用' : '已禁用'}</p>
+              </div>
+            ) : (
+              <p className="text-sm text-neutral-500">未配置分析工具</p>
+            )}
+          </Card>
+        )}
       </motion.div>
 
       <motion.div

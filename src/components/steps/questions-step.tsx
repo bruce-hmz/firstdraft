@@ -74,7 +74,7 @@ function getQuestionsForIdea(t: (key: string) => string, idea: string): Question
 export function QuestionsStep() {
   const t = useTranslations();
   const {
-    generationFlow: { questions, answers, isLoading, idea, template },
+    generationFlow: { questions, answers, isLoading, idea, template, brandStyle },
     setAnswer,
     setQuestions,
     setGenerationStep,
@@ -164,51 +164,17 @@ export function QuestionsStep() {
 
     setLoading(true);
     setError(null);
-    setGenerationStep('generating');
-
-    // Track generation started
-    const startTime = Date.now();
-    analytics.generationStarted(idea.length);
-
+    
     try {
       const deductSuccess = await deductCredit();
       if (!deductSuccess) {
         setShowPaywall(true);
-        setLoading(false);
-        setGenerationStep('questions');
         return;
       }
 
-      const response = await fetch('/api/generate/page', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          idea,
-          answers,
-          language: locale,
-          metadata: {
-            template,
-          },
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error?.message || t('errors.generateError'));
-      }
-
-      // Track generation completed
-      const duration = Date.now() - startTime;
-      analytics.generationCompleted(duration);
-
-      setResult(data.data.page, '', '');
-      setGenerationStep('result');
+      setGenerationStep('ab-selection');
     } catch (err) {
       setError(err instanceof Error ? err.message : t('errors.genericError'));
-      setGenerationStep('questions');
     } finally {
       setLoading(false);
     }

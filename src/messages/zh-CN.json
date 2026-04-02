@@ -181,7 +181,10 @@
     "proBadge": "Pro",
     "newMobileApp": "新移动应用",
     "newProduct": "新产品",
-    "generatedBy": "由 FirstDraft 生成"
+    "generatedBy": "由 FirstDraft 生成",
+    "logoSelection": "选择 Logo",
+    "logoSelectionDescription": "为你的产品选择一个合适的 Logo，或重新生成更多选项",
+    "generateMoreLogos": "生成更多 Logo"
   },
   "templateSelect": {
     "backToIdea": "重新输入想法",
@@ -357,6 +360,39 @@
     "confirmTopUp": "确认充值",
     "search": "搜索",
     "recharge": "充值"
+  },
+  "brandStyle": {
+    "pageTitle": "选择品牌风格",
+    "pageDescription": "为你的产品选择一种风格，AI 将生成相应的页面设计",
+    "buttonNext": "继续",
+    "selected": "已选择",
+    "default": {
+      "name": "默认风格",
+      "description": "平衡现代与专业，适合大多数产品"
+    },
+    "minimalTech": {
+      "name": "极简科技感",
+      "description": "干净现代的科技风格，突出产品功能"
+    },
+    "playfulFamily": {
+      "name": "活泼亲子风",
+      "description": "温暖活泼的风格，适合家庭和育儿产品"
+    },
+    "professionalBusiness": {
+      "name": "专业商务感",
+      "description": "正式专业的风格，适合企业和商务产品"
+    }
+  },
+  "aiQuestions": {
+    "title": "AI 引导式追问",
+    "description": "为了生成更精准的产品页面，AI 有几个问题需要你回答",
+    "answerPlaceholder": "请输入你的回答",
+    "continue": "继续"
+  },
+  "abSelection": {
+    "title": "选择文案版本",
+    "description": "我们为你生成了两套不同风格的文案，选择你喜欢的版本",
+    "continue": "继续"
   },
   "errors": {
     "authError": "认证失败",
