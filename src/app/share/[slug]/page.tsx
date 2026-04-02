@@ -65,6 +65,11 @@ interface PageData {
   created_at: string;
 }
 
+interface MediaItem {
+  id: string;
+  url: string;
+}
+
 export async function generateMetadata({ params }: SharePageProps): Promise<Metadata> {
   const resolvedParams = await params;
   try {
@@ -125,14 +130,14 @@ export default async function SharePage({ params }: SharePageProps) {
       .single();
 
     // 获取页面关联的媒体文件
-    let media = [];
+    let media: MediaItem[] = [];
     if (data) {
       const { data: mediaData } = await supabase
         .from('media')
         .select('id, url')
         .eq('page_id', data.id)
         .order('created_at', { ascending: false });
-      media = mediaData || [];
+      media = (mediaData as MediaItem[] | null) || [];
     }
 
     if (error || !data) {
