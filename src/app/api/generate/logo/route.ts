@@ -35,9 +35,10 @@ export async function POST(request: NextRequest) {
           size: '1024x1024',
         });
 
+        const imageUrl = response.data && response.data.length > 0 ? response.data[0].url : '';
         return {
           id: index + 1,
-          url: response.data?.[0]?.url ?? '',
+          url: imageUrl,
           prompt,
         };
       } catch (error) {
