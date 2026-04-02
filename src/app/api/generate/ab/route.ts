@@ -80,10 +80,22 @@ Format the response as a JSON object with these fields.
       })
     ]);
 
+    // 清理 AI 生成的内容，移除 markdown 代码块标记
+    const cleanContent = (content: string) => {
+      // 移除 markdown 代码块标记
+      let cleaned = content.replace(/```json\s*/g, '').replace(/```\s*/g, '');
+      // 移除开头和结尾的空白
+      cleaned = cleaned.trim();
+      return cleaned;
+    };
+
+    const cleanRationalContent = cleanContent(rationalContent);
+    const cleanEmotionalContent = cleanContent(emotionalContent);
+
     // 尝试解析 JSON
     try {
-      const rationalData = JSON.parse(rationalContent);
-      const emotionalData = JSON.parse(emotionalContent);
+      const rationalData = JSON.parse(cleanRationalContent);
+      const emotionalData = JSON.parse(cleanEmotionalContent);
 
       return NextResponse.json({
         success: true,
@@ -107,8 +119,8 @@ Format the response as a JSON object with these fields.
     } catch (error) {
       // 尝试提取有效的 JSON 部分
       try {
-        const rationalClean = rationalContent.replace(/^[\s\S]*?({[\s\S]*})[\s\S]*$/, '$1');
-        const emotionalClean = emotionalContent.replace(/^[\s\S]*?({[\s\S]*})[\s\S]*$/, '$1');
+        const rationalClean = cleanRationalContent.replace(/^[\s\S]*?({[\s\S]*})[\s\S]*$/, '$1');
+        const emotionalClean = cleanEmotionalContent.replace(/^[\s\S]*?({[\s\S]*})[\s\S]*$/, '$1');
         
         const rationalData = JSON.parse(rationalClean);
         const emotionalData = JSON.parse(emotionalClean);

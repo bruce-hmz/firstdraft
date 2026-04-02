@@ -67,10 +67,13 @@ Format the response as a JSON object with a 'code' field containing the generate
       maxTokens: 4000
     });
 
+    // 清理 AI 生成的内容，移除 markdown 代码块标记
+    const cleanCodeText = codeText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+
     return NextResponse.json({
       success: true,
       data: {
-        code: codeText,
+        code: cleanCodeText,
         format,
       },
     });

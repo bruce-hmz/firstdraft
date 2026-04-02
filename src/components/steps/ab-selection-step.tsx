@@ -16,6 +16,23 @@ export function ABSelectionStep() {
   const [error, setError] = useState<string | null>(null);
   const [selectedVersion, setSelectedVersion] = useState<string | null>(null);
 
+  // 将 snake_case 转换为 camelCase
+  const snakeToCamel = (obj: any): any => {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+    
+    if (Array.isArray(obj)) {
+      return obj.map(snakeToCamel);
+    }
+    
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      acc[camelKey] = snakeToCamel(obj[key]);
+      return acc;
+    }, {} as any);
+  };
+
   useEffect(() => {
     generateVersions();
   }, [idea, brandStyle]);
@@ -54,8 +71,9 @@ export function ABSelectionStep() {
     if (selectedVersion) {
       const selected = versions.find(v => v.id === selectedVersion);
       if (selected) {
-        // 这里简化处理，实际应该使用完整的页面生成流程
-        setResult(selected.content, '', '');
+        // 转换 snake_case 为 camelCase
+        const camelCaseContent = snakeToCamel(selected.content);
+        setResult(camelCaseContent, '', '');
         setGenerationStep('result');
       }
     }
@@ -125,7 +143,7 @@ export function ABSelectionStep() {
                   <div className="space-y-3">
                     <div>
                       <h4 className="text-sm font-medium text-neutral-700 mb-1">Product Name</h4>
-                      <p className="text-neutral-900">{version.content.productName}</p>
+                      <p className="text-neutral-900">{version.content.product_name}</p>
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-neutral-700 mb-1">Tagline</h4>

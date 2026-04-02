@@ -59,10 +59,13 @@ Format the response as a JSON object.
       maxTokens: 2000
     });
 
+    // 清理 AI 生成的内容，移除 markdown 代码块标记
+    const cleanPrototypeText = prototypeText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+
     // 尝试解析 JSON
     let prototypeContent;
     try {
-      prototypeContent = JSON.parse(prototypeText);
+      prototypeContent = JSON.parse(cleanPrototypeText);
     } catch (error) {
       return NextResponse.json(
         { error: 'Failed to parse prototype content' },

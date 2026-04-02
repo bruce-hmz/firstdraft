@@ -56,10 +56,13 @@ Format the response as a JSON object with these fields.
       maxTokens: 1000
     });
 
+    // 清理 AI 生成的内容，移除 markdown 代码块标记
+    const cleanSeoText = seoText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+
     // 尝试解析 JSON
     let seoContent;
     try {
-      seoContent = JSON.parse(seoText);
+      seoContent = JSON.parse(cleanSeoText);
     } catch (error) {
       return NextResponse.json(
         { error: 'Failed to parse SEO content' },
