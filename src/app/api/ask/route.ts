@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +32,7 @@ Product idea: "${idea}"
 Return only the questions, each on a new line, numbered 1-5.
 `;
 
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
@@ -49,7 +47,7 @@ Return only the questions, each on a new line, numbered 1-5.
       max_tokens: 500,
     });
 
-    const questionsText = response.data.choices[0].message?.content || '';
+    const questionsText = response.choices[0].message?.content || '';
     const questions = questionsText
       .split('\n')
       .filter((line) => line.trim().length > 0)

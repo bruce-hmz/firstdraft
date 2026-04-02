@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,7 +56,7 @@ Generate clean, production-ready ${format} code with:
 For React/Vue, use functional components and modern syntax.
 `;
 
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
@@ -73,7 +71,7 @@ For React/Vue, use functional components and modern syntax.
       max_tokens: 3000,
     });
 
-    const code = response.data.choices[0].message?.content || '';
+    const code = response.choices[0].message?.content || '';
 
     return NextResponse.json({
       success: true,

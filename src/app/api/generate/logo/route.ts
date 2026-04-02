@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +29,7 @@ export async function POST(request: NextRequest) {
     // 调用 OpenAI DALL-E 生成 Logo
     const logoPromises = prompts.map(async (prompt, index) => {
       try {
-        const response = await openai.createImage({
+        const response = await openai.images.generate({
           prompt,
           n: 1,
           size: '1024x1024',
@@ -39,7 +37,7 @@ export async function POST(request: NextRequest) {
 
         return {
           id: index + 1,
-          url: response.data.data[0].url,
+          url: response.data?.[0]?.url ?? '',
           prompt,
         };
       } catch (error) {

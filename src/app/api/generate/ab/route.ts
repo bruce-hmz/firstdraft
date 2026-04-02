@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,7 +56,7 @@ Format the response as a JSON object with these fields.
 
     // 并行生成两个版本
     const [rationalResponse, emotionalResponse] = await Promise.all([
-      openai.createChatCompletion({
+      openai.chat.completions.create({
         model: 'gpt-4o',
         messages: [
           {
@@ -72,7 +70,7 @@ Format the response as a JSON object with these fields.
         ],
         max_tokens: 2000,
       }),
-      openai.createChatCompletion({
+      openai.chat.completions.create({
         model: 'gpt-4o',
         messages: [
           {
@@ -89,8 +87,8 @@ Format the response as a JSON object with these fields.
     ]);
 
     // 解析响应
-    const rationalText = rationalResponse.data.choices[0].message?.content || '';
-    const emotionalText = emotionalResponse.data.choices[0].message?.content || '';
+    const rationalText = rationalResponse.choices[0].message?.content || '';
+    const emotionalText = emotionalResponse.choices[0].message?.content || '';
 
     // 尝试解析 JSON
     let rationalContent, emotionalContent;

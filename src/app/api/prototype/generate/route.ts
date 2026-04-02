@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
-const openai = new OpenAIApi(configuration);
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,7 +48,7 @@ Generate a JSON object with:
 Format the response as a JSON object.
 `;
 
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
         {
@@ -65,7 +63,7 @@ Format the response as a JSON object.
       max_tokens: 2000,
     });
 
-    const prototypeText = response.data.choices[0].message?.content || '';
+    const prototypeText = response.choices[0].message?.content || '';
 
     // 尝试解析 JSON
     let prototypeContent;
