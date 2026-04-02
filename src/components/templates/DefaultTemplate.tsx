@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import type { PageContent } from '@/types';
 import { useTranslations } from '@/lib/next-intl';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Image as ImageIcon } from 'lucide-react';
 
 interface DefaultTemplateProps {
   content: PageContent;

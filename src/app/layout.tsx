@@ -6,10 +6,7 @@ import { cookies } from 'next/headers';
 import { AnalyticsProvider } from '@/components/analytics-provider';
 import { FeedbackButton } from '@/components/feedback-button';
 import "./globals.css";
-import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
-
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 
 // 强制动态渲染，改善水合问题
@@ -45,7 +42,7 @@ export default async function RootLayout({
   const locale = await getLocaleFromCookie();
 
   return (
-    <html lang={locale} suppressHydrationWarning className={cn("font-sans", geist.variable)}>
+    <html lang={locale} suppressHydrationWarning className="font-sans">
       <body className="font-sans antialiased">
         <AnalyticsProvider>
           <TranslationsProvider locale={locale}>

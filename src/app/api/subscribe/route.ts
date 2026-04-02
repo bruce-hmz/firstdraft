@@ -58,7 +58,7 @@ async function triggerWebhooks(supabase: any, pageId: string, subscriptionData: 
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { page_id, email, name, metadata } = await request.json();
 
     if (!page_id || !email) {
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const page_id = request.nextUrl.searchParams.get('page_id');
 
     if (!page_id) {

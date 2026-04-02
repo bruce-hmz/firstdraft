@@ -38,7 +38,7 @@ async function sendWebhook(url: string, secret: string | null, payload: any) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { webhook_id } = await request.json();
 
     if (!webhook_id) {

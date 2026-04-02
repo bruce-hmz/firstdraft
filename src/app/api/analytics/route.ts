@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const page_id = request.nextUrl.searchParams.get('page_id');
 
     if (!page_id) {
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { page_id, google_analytics_id, baidu_analytics_id, custom_scripts, enabled } = await request.json();
 
     if (!page_id) {

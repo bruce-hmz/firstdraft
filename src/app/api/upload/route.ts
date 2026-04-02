@@ -4,7 +4,7 @@ import { nanoid } from 'nanoid';
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const page_id = formData.get('page_id') as string;
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const page_id = request.nextUrl.searchParams.get('page_id');
 
     if (!page_id) {
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const id = request.nextUrl.searchParams.get('id');
 
     if (!id) {

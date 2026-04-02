@@ -12,7 +12,7 @@ import { Loader2, MessageSquare, ArrowRight, CheckCircle2 } from 'lucide-react';
 export function AIQuestionsStep() {
   const { generationFlow: { idea }, setGenerationStep } = useAppStore();
   
-  const onComplete = () => {
+  const onComplete = (answers: Record<string, string>) => {
     setGenerationStep('questions');
   };
   

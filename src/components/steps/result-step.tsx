@@ -390,7 +390,7 @@ export function ResultStep() {
                 <Input
                   placeholder="UA-XXXXXXXX-X 或 G-XXXXXXXXXX"
                   defaultValue={analyticsConfig?.google_analytics_id || ''}
-                  onChange={(e) => setAnalyticsConfig(prev => ({ ...prev, google_analytics_id: e.target.value }))}
+                  onChange={(e) => setAnalyticsConfig((prev: any) => ({ ...prev, google_analytics_id: e.target.value }))}
                 />
               </div>
               <div>
@@ -398,7 +398,7 @@ export function ResultStep() {
                 <Input
                   placeholder="百度统计站点ID"
                   defaultValue={analyticsConfig?.baidu_analytics_id || ''}
-                  onChange={(e) => setAnalyticsConfig(prev => ({ ...prev, baidu_analytics_id: e.target.value }))}
+                  onChange={(e) => setAnalyticsConfig((prev: any) => ({ ...prev, baidu_analytics_id: e.target.value }))}
                 />
               </div>
               <div>
@@ -406,7 +406,7 @@ export function ResultStep() {
                 <Textarea
                   placeholder="添加自定义分析脚本"
                   defaultValue={analyticsConfig?.custom_scripts || ''}
-                  onChange={(e) => setAnalyticsConfig(prev => ({ ...prev, custom_scripts: e.target.value }))}
+                  onChange={(e) => setAnalyticsConfig((prev: any) => ({ ...prev, custom_scripts: e.target.value }))}
                   rows={4}
                 />
               </div>
@@ -414,7 +414,7 @@ export function ResultStep() {
                 <input
                   type="checkbox"
                   checked={analyticsConfig?.enabled ?? true}
-                  onChange={(e) => setAnalyticsConfig(prev => ({ ...prev, enabled: e.target.checked }))}
+                  onChange={(e) => setAnalyticsConfig((prev: any) => ({ ...prev, enabled: e.target.checked }))}
                   className="mr-2"
                 />
                 <label className="text-sm text-neutral-700">启用分析</label>

@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const page_id = request.nextUrl.searchParams.get('page_id');
 
     if (!page_id) {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { page_id, url, secret, enabled, events } = await request.json();
 
     if (!page_id || !url) {
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { id, url, secret, enabled, events } = await request.json();
 
     if (!id) {
@@ -142,7 +142,7 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const id = request.nextUrl.searchParams.get('id');
 
     if (!id) {
