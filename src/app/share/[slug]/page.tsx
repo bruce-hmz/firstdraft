@@ -124,6 +124,17 @@ export default async function SharePage({ params }: SharePageProps) {
       .eq('slug', resolvedParams.slug)
       .single();
 
+    // 获取页面关联的媒体文件
+    let media = [];
+    if (data) {
+      const { data: mediaData } = await supabase
+        .from('media')
+        .select('id, url')
+        .eq('page_id', data.id)
+        .order('created_at', { ascending: false });
+      media = mediaData || [];
+    }
+
     if (error || !data) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-white">
@@ -215,7 +226,7 @@ export default async function SharePage({ params }: SharePageProps) {
           />
         )}
 
-        <TemplateComponent content={content} pageId={pageData.id} />
+        <TemplateComponent content={content} pageId={pageData.id} media={media} />
       </>
     );
   } catch (error) {

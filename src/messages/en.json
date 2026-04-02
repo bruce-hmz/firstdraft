@@ -20,9 +20,12 @@
     "retry": "Retry",
     "error": "Error",
     "success": "Success",
-    "or": "or",
+    "or": "Or",
     "times": "times",
-    "per_time": "/time"
+    "per_time": "/time",
+    "problem": "Problem",
+    "solution": "Solution",
+    "coreFeatures": "Core Features"
   },
   "nav": {
     "admin": "Admin",

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslations } from '@/lib/next-intl';
+import { useLanguage } from '@/hooks/use-language';
 import { useAppStore } from '@/stores/app-store';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -10,6 +11,7 @@ import { Loader2, SplitSquareVertical, CheckCircle2, ArrowRight } from 'lucide-r
 
 export function ABSelectionStep() {
   const t = useTranslations();
+  const { locale } = useLanguage();
   const { generationFlow: { idea, brandStyle }, setGenerationStep, setResult } = useAppStore();
   const [versions, setVersions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,7 +49,7 @@ export function ABSelectionStep() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ idea, brandStyle }),
+        body: JSON.stringify({ idea, brandStyle, language: locale }),
       });
 
       const data = await response.json();
@@ -80,16 +82,16 @@ export function ABSelectionStep() {
           tagline: camelCaseContent.tagline || '',
           description: camelCaseContent.description || '',
           problemSection: {
-            headline: '问题',
+            headline: t('common.problem'),
             description: camelCaseContent.problemSection || '',
             painPoints: [camelCaseContent.problemSection || '']
           },
           solutionSection: {
-            headline: '解决方案',
+            headline: t('common.solution'),
             description: camelCaseContent.solutionSection || '',
             features: [
               {
-                title: '核心功能',
+                title: t('common.coreFeatures'),
                 description: camelCaseContent.solutionSection || ''
               }
             ]

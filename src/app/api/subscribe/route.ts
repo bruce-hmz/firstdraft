@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     // 创建订阅
     const { data: subscription, error: subscriptionError } = await supabase
-      .from('subscriptions')
+      .from('waitlist_subscriptions')
       .insert({
         page_id,
         email,
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
     }
 
     const { data: subscriptions, error } = await supabase
-      .from('subscriptions')
+      .from('waitlist_subscriptions')
       .select('*')
       .eq('page_id', page_id)
       .order('created_at', { ascending: false });

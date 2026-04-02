@@ -22,7 +22,10 @@
     "success": "成功",
     "or": "或",
     "times": "次",
-    "per_time": "/次"
+    "per_time": "/次",
+    "problem": "问题",
+    "solution": "解决方案",
+    "coreFeatures": "核心功能"
   },
   "nav": {
     "admin": "管理后台",
