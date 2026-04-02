@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { getAIClient } from '@/lib/models/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,17 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查 API 密钥
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
-        { status: 500 }
-      );
-    }
-
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const aiClient = await getAIClient();
 
     // 生成 SEO 优化内容
     const prompt = `
@@ -53,22 +43,18 @@ Generate:
 Format the response as a JSON object with these fields.
 `;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an SEO expert specializing in product pages. Generate optimized meta tags, keywords, and SEO-friendly copy.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      max_tokens: 1000,
+    const seoText = await aiClient.chatCompletion([
+      {
+        role: 'system',
+        content: 'You are an SEO specialist specializing in technical SEO and content optimization.'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ], {
+      maxTokens: 1000
     });
-
-    const seoText = response.choices[0].message?.content || '';
 
     // 尝试解析 JSON
     let seoContent;

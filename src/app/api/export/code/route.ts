@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { getAIClient } from '@/lib/models/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,17 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查 API 密钥
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
-        { status: 500 }
-      );
-    }
-
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const aiClient = await getAIClient();
 
     // 生成代码
     const prompt = `
@@ -56,35 +46,31 @@ Subtext: ${pageContent.ctaSection.subtext || ''}
 
 Generate clean, production-ready ${format} code with:
 1. Proper structure and indentation
-2. Responsive design using Tailwind CSS
-3. Clear class names
-4. No unnecessary comments
-5. All content properly integrated
+2. Modern best practices
+3. Responsive design
+4. Clear comments
+5. No external dependencies
 
-For React/Vue, use functional components and modern syntax.
+Format the response as a JSON object with a 'code' field containing the generated code.
 `;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: `You are a professional frontend developer. Convert product page content into clean, production-ready ${format} code.`
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      max_tokens: 3000,
+    const codeText = await aiClient.chatCompletion([
+      {
+        role: 'system',
+        content: 'You are a professional web developer specializing in clean, efficient code.'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ], {
+      maxTokens: 4000
     });
-
-    const code = response.choices[0].message?.content || '';
 
     return NextResponse.json({
       success: true,
       data: {
-        code,
+        code: codeText,
         format,
       },
     });

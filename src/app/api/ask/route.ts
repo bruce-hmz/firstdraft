@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { getAIClient } from '@/lib/models/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,17 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查 API 密钥
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
-        { status: 500 }
-      );
-    }
-
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const aiClient = await getAIClient();
 
     // 分析用户想法并生成追问问题
     const prompt = `
@@ -40,31 +30,27 @@ Product idea: "${idea}"
 Return only the questions, each on a new line, numbered 1-5.
 `;
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are an AI product consultant who helps entrepreneurs clarify their product ideas by asking insightful questions.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      max_tokens: 500,
+    const questionsText = await aiClient.chatCompletion([
+      {
+        role: 'system',
+        content: 'You are an AI product consultant who helps entrepreneurs clarify their product ideas by asking insightful questions.'
+      },
+      {
+        role: 'user',
+        content: prompt
+      }
+    ], {
+      maxTokens: 500
     });
-
-    const questionsText = response.choices[0].message?.content || '';
     const questions = questionsText
       .split('\n')
-      .filter((line) => line.trim().length > 0)
-      .map((line) => {
+      .filter((line: string) => line.trim().length > 0)
+      .map((line: string) => {
         // 移除数字编号
         const cleaned = line.replace(/^\d+\.\s*/, '').trim();
         return cleaned;
       })
-      .filter((q) => q.length > 0)
+      .filter((q: string) => q.length > 0)
       .slice(0, 5);
 
     if (questions.length === 0) {

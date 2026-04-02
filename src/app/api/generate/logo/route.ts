@@ -14,15 +14,19 @@ export async function POST(request: NextRequest) {
     }
 
     // 检查 API 密钥
-    if (!process.env.OPENAI_API_KEY) {
+    const apiKey = process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
       return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
+        { error: 'AI API key not configured' },
         { status: 500 }
       );
     }
 
+    const baseUrl = process.env.AI_BASE_URL || 'https://api.deepseek.com/v1';
+
     const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey,
+      baseURL: baseUrl,
     });
 
     // 生成 Logo 提示词

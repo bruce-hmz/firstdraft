@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { getAIClient } from '@/lib/models/utils';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,17 +12,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 检查 API 密钥
-    if (!process.env.OPENAI_API_KEY) {
-      return NextResponse.json(
-        { error: 'OpenAI API key not configured' },
-        { status: 500 }
-      );
-    }
-
-    const openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
+    const aiClient = await getAIClient();
 
     // 生成理性版本文案
     const rationalPrompt = `
@@ -56,53 +46,64 @@ Include:
 2. Tagline (evoking emotional response)
 3. Description (emphasizing user experience and emotional benefits)
 4. Problem section (emotional pain points and how the product makes users feel)
-5. Solution section (features presented through emotional benefits)
+5. Solution section (how the product improves emotional well-being)
 6. CTA (focused on emotional outcomes)
 
 Format the response as a JSON object with these fields.
 `;
 
     // 并行生成两个版本
-    const [rationalResponse, emotionalResponse] = await Promise.all([
-      openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a professional copywriter specializing in rational, feature-focused product descriptions.'
-          },
-          {
-            role: 'user',
-            content: rationalPrompt
-          }
-        ],
-        max_tokens: 2000,
+    const [rationalContent, emotionalContent] = await Promise.all([
+      aiClient.chatCompletion([
+        {
+          role: 'system',
+          content: 'You are a professional copywriter specializing in product marketing.'
+        },
+        {
+          role: 'user',
+          content: rationalPrompt
+        }
+      ], {
+        maxTokens: 2000
       }),
-      openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a professional copywriter specializing in emotional, user-centered product descriptions.'
-          },
-          {
-            role: 'user',
-            content: emotionalPrompt
-          }
-        ],
-        max_tokens: 2000,
+      aiClient.chatCompletion([
+        {
+          role: 'system',
+          content: 'You are a professional copywriter specializing in emotional marketing.'
+        },
+        {
+          role: 'user',
+          content: emotionalPrompt
+        }
+      ], {
+        maxTokens: 2000
       })
     ]);
 
-    // 解析响应
-    const rationalText = rationalResponse.choices[0].message?.content || '';
-    const emotionalText = emotionalResponse.choices[0].message?.content || '';
-
     // 尝试解析 JSON
-    let rationalContent, emotionalContent;
     try {
-      rationalContent = JSON.parse(rationalText);
-      emotionalContent = JSON.parse(emotionalText);
+      const rationalData = JSON.parse(rationalContent);
+      const emotionalData = JSON.parse(emotionalContent);
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          versions: [
+            {
+              id: 'rational',
+              name: 'Rational (Feature-focused)',
+              description: 'Focuses on features, functionality, and practical benefits',
+              content: rationalData
+            },
+            {
+              id: 'emotional',
+              name: 'Emotional (Experience-focused)',
+              description: 'Focuses on user experience, emotional benefits, and storytelling',
+              content: emotionalData
+            }
+          ]
+        },
+      });
     } catch (error) {
       return NextResponse.json(
         { error: 'Failed to parse generated content' },
@@ -110,25 +111,7 @@ Format the response as a JSON object with these fields.
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        versions: [
-          {
-            id: 'rational',
-            name: 'Rational (Feature-focused)',
-            description: 'Focuses on features, functionality, and practical benefits',
-            content: rationalContent
-          },
-          {
-            id: 'emotional',
-            name: 'Emotional (Experience-focused)',
-            description: 'Focuses on user experience, emotional benefits, and storytelling',
-            content: emotionalContent
-          }
-        ]
-      },
-    });
+
   } catch (error) {
     console.error('Error generating A/B versions:', error);
     return NextResponse.json(
