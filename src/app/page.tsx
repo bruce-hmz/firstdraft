@@ -8,7 +8,7 @@ import { IdeaInputSection } from '@/components/sections/idea-input-section';
 import { ExampleIdeas } from '@/components/sections/example-ideas';
 import { Button } from '@/components/ui/button';
 import { Section } from '@/components/ui/section';
-import { Sparkles, Zap, Clock, Share2, ArrowRight, Check, Globe, Wand2, Users } from 'lucide-react';
+import { Sparkles, Zap, Clock, Share2, ArrowRight, Check, Globe, Wand2, Users, Gift } from 'lucide-react';
 
 export default function Home() {
   const t = useTranslations();
@@ -104,6 +104,16 @@ export default function Home() {
 
       <Navbar showBackButton={false} onBack={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
       <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+
+      {/* New User Free Credits Banner */}
+      <div className="bg-gradient-to-r from-brand via-brand/90 to-purple-600 text-white py-3 px-4 text-center">
+        <div className="max-w-4xl mx-auto flex items-center justify-center gap-2">
+          <Gift className="h-5 w-5" />
+          <span className="font-medium">
+            {t('home.newUserBanner')}
+          </span>
+        </div>
+      </div>
 
       {/* Hero Section */}
       <section className="pt-24 pb-12 sm:pt-32 sm:pb-16 px-4 relative">

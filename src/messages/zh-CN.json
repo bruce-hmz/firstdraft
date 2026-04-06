@@ -38,7 +38,8 @@
     "titleLine2": "终于可以见人了",
     "description": "别让好想法烂在脑子里。",
     "descriptionLine2": "3分钟，给它一个像样的家",
-    "cta": "开始生成",
+    "cta": "免费生成，30秒搞定",
+    "newUserBanner": "🎁 新用户赠送 3 次免费生成机会",
     "ideaInputTitle": "你的想法是什么？",
     "ideaInputDescription": "用几句话描述你的产品想法，AI 会帮你把它变成一个完整的产品页面",
     "ideaPlaceholder": "例如：一个帮助开发者快速找到代码片段的工具...",
@@ -146,8 +147,8 @@
     },
     "bottomCta": {
       "title": "准备好让你的想法见人了么？",
-      "subtitle": "只需要3分钟，给你的想法一个专业的开始",
-      "button": "立即开始"
+      "subtitle": "免费，30秒生成你的产品落地页",
+      "button": "免费开始"
     }
   },
   "generate": {
@@ -222,6 +223,7 @@
     "signUpTitle": "创建账户",
     "signInDescription": "登录以管理您的页面草稿",
     "signUpDescription": "创建账户以保存和管理您的页面",
+    "signUpDescriptionMagicLink": "只需邮箱，一键注册登录",
     "email": "邮箱",
     "emailPlaceholder": "your@email.com",
     "password": "密码",
@@ -235,7 +237,19 @@
     "processing": "处理中...",
     "confirmEmail": "确认邮件已发送至 {email}，请检查收件箱并点击确认链接。如果没有收到，请检查垃圾邮件文件夹。",
     "loginRequired": "请先登录后再使用",
-    "loginRequiredDescription": "登录后即可使用 AI 生成功能，创建属于你的产品页面"
+    "loginRequiredDescription": "登录后即可使用 AI 生成功能，创建属于你的产品页面",
+    "loginToSave": "登录后即可保存并分享您的页面，新用户将获得 3 次免费生成额度",
+    "sendMagicLink": "发送登录链接",
+    "magicLinkSent": "登录链接已发送",
+    "magicLinkSentDescription": "我们已向 {email} 发送了登录链接，请点击邮件中的链接完成登录",
+    "magicLinkHint": "点击邮件中的按钮即可登录",
+    "magicLinkCheckSpam": "如果没有收到，请检查垃圾邮件文件夹",
+    "magicLinkExpiry": "链接有效期15分钟",
+    "magicLinkResend": "重新发送",
+    "signupBenefits": "新用户福利",
+    "benefit3Free": "赠送 3 次免费生成",
+    "benefitNoPassword": "无需记忆密码",
+    "benefitInstant": "秒级注册体验"
   },
   "billing": {
     "title": "购买生成额度",
@@ -256,6 +270,9 @@
     "paymentError": "创建支付会话失败，请重试",
     "paymentUnavailable": "支付系统暂时不可用",
     "getCredits": "获取额度",
+    "newUserGift": "新用户福利",
+    "remainingCredits": "剩余免费生成次数",
+    "creditsHint": "每次生成消耗 1 次额度，用完可购买更多",
     "followTitle": "还想解锁更多使用？",
     "followDescription": "关注我们的公众号，获取更多使用次数和专属福利",
     "wechatOfficialAccount": "微信公众号",

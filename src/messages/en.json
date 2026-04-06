@@ -38,7 +38,8 @@
     "titleLine2": "Finally ready to see the light",
     "description": "Don't let great ideas rot in your head.",
     "descriptionLine2": "3 minutes. Give it a proper home.",
-    "cta": "Start Generating",
+    "cta": "Generate Free in 30s",
+    "newUserBanner": "🎁 New users get 3 free generations",
     "ideaInputTitle": "What's your idea?",
     "ideaInputDescription": "Describe your product idea in a few sentences, and AI will turn it into a complete product page",
     "ideaPlaceholder": "e.g., A tool that helps developers quickly find code snippets...",
@@ -146,8 +147,8 @@
     },
     "bottomCta": {
       "title": "Ready to bring your idea to life?",
-      "subtitle": "Just 3 minutes to give your idea a professional start",
-      "button": "Get Started"
+      "subtitle": "Free, generate your product landing page in 30 seconds",
+      "button": "Start Free"
     }
   },
   "generate": {
@@ -222,6 +223,7 @@
     "signUpTitle": "Create Account",
     "signInDescription": "Sign in to manage your page drafts",
     "signUpDescription": "Create an account to save and manage your pages",
+    "signUpDescriptionMagicLink": "Just email, one-click sign up",
     "email": "Email",
     "emailPlaceholder": "your@email.com",
     "password": "Password",
@@ -235,7 +237,19 @@
     "processing": "Processing...",
     "confirmEmail": "Confirmation email sent to {email}. Please check your inbox and click the confirmation link. If you don't receive it, please check your spam folder.",
     "loginRequired": "Please login to continue",
-    "loginRequiredDescription": "Login to use the AI generation feature and create your product pages"
+    "loginRequiredDescription": "Login to use the AI generation feature and create your product pages",
+    "loginToSave": "Login to save and share your page. New users get 3 free credits!",
+    "sendMagicLink": "Send Login Link",
+    "magicLinkSent": "Login Link Sent",
+    "magicLinkSentDescription": "We've sent a login link to {email}. Click the link in your email to sign in",
+    "magicLinkHint": "Click the button in your email to sign in",
+    "magicLinkCheckSpam": "If you don't see it, check your spam folder",
+    "magicLinkExpiry": "Link expires in 15 minutes",
+    "magicLinkResend": "Resend Link",
+    "signupBenefits": "New User Benefits",
+    "benefit3Free": "3 free generations included",
+    "benefitNoPassword": "No password to remember",
+    "benefitInstant": "Instant sign up experience"
   },
   "billing": {
     "title": "Purchase Generation Credits",
@@ -256,6 +270,9 @@
     "paymentError": "Failed to create payment session, please try again",
     "paymentUnavailable": "Payment system temporarily unavailable",
     "getCredits": "Get Credits",
+    "newUserGift": "New User Gift",
+    "remainingCredits": "Free generations remaining",
+    "creditsHint": "Each generation uses 1 credit. Purchase more when you run out",
     "followTitle": "Want to unlock more usage?",
     "followDescription": "Follow our official account to get more usage credits and exclusive benefits",
     "wechatOfficialAccount": "WeChat Official Account",

@@ -78,36 +78,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // 检查用户登录和额度
+    // Check if user is logged in (optional for anonymous generation)
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.json(
-        { success: false, error: { code: 'UNAUTHORIZED', message: '请先登录' } },
-        { status: 401 }
-      );
-    }
+    // Only deduct credits for logged-in users
+    if (user) {
+      // 检查额度
+      const { data: success, error: deductError } = await supabase.rpc('deduct_credits', {
+        user_id: user.id,
+        amount: 1,
+      });
 
-    // 检查额度
-    const { data: success, error: deductError } = await supabase.rpc('deduct_credits', {
-      user_id: user.id,
-      amount: 1,
-    });
+      if (deductError) {
+        console.error('Deduct credits error:', deductError);
+        return NextResponse.json(
+          { success: false, error: { code: 'DEDUCT_FAILED', message: '额度扣减失败: ' + deductError.message } },
+          { status: 500 }
+        );
+      }
 
-    if (deductError) {
-      console.error('Deduct credits error:', deductError);
-      return NextResponse.json(
-        { success: false, error: { code: 'DEDUCT_FAILED', message: '额度扣减失败: ' + deductError.message } },
-        { status: 500 }
-      );
-    }
-
-    if (!success) {
-      return NextResponse.json(
-        { success: false, error: { code: 'INSUFFICIENT_CREDITS', message: '额度不足，请充值后继续' } },
-        { status: 400 }
-      );
+      if (!success) {
+        return NextResponse.json(
+          { success: false, error: { code: 'INSUFFICIENT_CREDITS', message: '额度不足，请充值后继续' } },
+          { status: 400 }
+        );
+      }
     }
 
     const client = await getAIClient()

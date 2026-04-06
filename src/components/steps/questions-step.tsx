@@ -83,7 +83,7 @@ export function QuestionsStep() {
     setError,
   } = useAppStore();
 
-  const { checkPaywall, deductCredit } = useBilling();
+  const { checkPaywall, deductCredit, remainingCredits } = useBilling();
   const { locale } = useLanguage();
   const [showPaywall, setShowPaywall] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -183,7 +183,7 @@ export function QuestionsStep() {
   const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
 
   if (showPaywall) {
-    return <Paywall onClose={() => setShowPaywall(false)} />;
+    return <Paywall onClose={() => setShowPaywall(false)} remainingCredits={remainingCredits} />;
   }
 
   if (!currentQuestion) return null;

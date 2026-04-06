@@ -3,7 +3,7 @@
 
 import nodemailer from 'nodemailer'
 
-interface EmailOptions {
+export interface EmailOptions {
   to: string
   subject: string
   html: string
@@ -50,7 +50,7 @@ function createSmtpTransporter() {
 }
 
 // 使用 SMTP 发送邮件（支持 Gmail、QQ、163 等）
-async function sendWithSmtp(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
+export async function sendWithSmtp(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
   const transporter = createSmtpTransporter()
 
   if (!transporter) {
@@ -93,7 +93,7 @@ async function sendWithSmtp(options: EmailOptions): Promise<{ success: boolean; 
 }
 
 // 使用 Resend 发送邮件
-async function sendWithResend(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
+export async function sendWithResend(options: EmailOptions): Promise<{ success: boolean; error?: string }> {
   const RESEND_API_KEY = process.env.RESEND_API_KEY
 
   if (!RESEND_API_KEY) {

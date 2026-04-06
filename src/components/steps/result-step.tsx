@@ -6,10 +6,19 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useAppStore } from '@/stores/app-store';
-import { Copy, Check, RefreshCw, Download, Sparkles, Loader2, Save, Edit2, Upload, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Copy, Check, RefreshCw, Download, Sparkles, Loader2, Save, Edit2, Upload, Image as ImageIcon, Trash2, LogIn } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from '@/lib/next-intl';
 import type { PageContent } from '@/types';
 import { analytics } from '@/lib/analytics';
@@ -17,6 +26,7 @@ import { LogoSelection } from './logo-selection';
 
 export function ResultStep() {
   const t = useTranslations();
+  const router = useRouter();
   const {
     generationFlow: { result, shareUrl, idea, projectId },
     setResult,
@@ -33,6 +43,27 @@ export function ResultStep() {
   const [editingAnalytics, setEditingAnalytics] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [showLogoSelection, setShowLogoSelection] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+
+  // Check auth status on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/user');
+        if (response.ok) {
+          const data = await response.json();
+          setIsLoggedIn(!!data.data?.email);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Failed to check auth:', error);
+        setIsLoggedIn(false);
+      }
+    };
+    checkAuth();
+  }, []);
 
   if (!result) return null;
 
@@ -144,6 +175,12 @@ export function ResultStep() {
     console.log('Initiating save and share process...');
     if (saving) return;
 
+    // Require login for Save & Share
+    if (!isLoggedIn) {
+      setShowLoginDialog(true);
+      return;
+    }
+
     try {
       setSaving(true);
       console.log('Starting save process...');
@@ -196,6 +233,11 @@ export function ResultStep() {
     }
   };
 
+  const handleGoToLogin = () => {
+    setShowLoginDialog(false);
+    router.push('/login');
+  };
+
   const handleCopy = async () => {
     if (currentShareUrl) {
       await navigator.clipboard.writeText(currentShareUrl);
@@ -243,6 +285,7 @@ export function ResultStep() {
   };
 
   return (
+    <>
     <div className="w-full max-w-4xl mx-auto space-y-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -810,5 +853,39 @@ export function ResultStep() {
       )}
 
     </div>
+
+    {/* Login prompt dialog for Save & Share */}
+    <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-4">
+            <LogIn className="h-8 w-8 text-white" />
+          </div>
+          <DialogTitle className="text-center text-xl">
+            {t('auth.loginRequired')}
+          </DialogTitle>
+          <DialogDescription className="text-center">
+            {t('auth.loginToSave')}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowLoginDialog(false)}
+            className="w-full sm:w-auto"
+          >
+            {t('common.cancel')}
+          </Button>
+          <Button
+            onClick={handleGoToLogin}
+            className="w-full sm:w-auto bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+          >
+            <LogIn className="h-4 w-4 mr-2" />
+            {t('nav.login')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
